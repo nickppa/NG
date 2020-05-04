@@ -35,12 +35,13 @@ class TemplateEngine {
             myNg = this.initNg(scope);
         }
         let result = compiled(myNg, this.config.global, model);
-        let pattern = /@\[(?<key>[_$a-zA-Z0-9\xA0-\uFFFF]+)\]/g;
-        result = result.replace(pattern, (m, cache)=>{
+        let pattern = /@\[(?<key> ?[_$a-zA-Z0-9\xA0-\uFFFF]+)\]/g;
+        result = result.replace(pattern, (m, key)=>{
+            let cache = (key || '').trim();
             let text = this._getCacheText(scope, myNg, cache);
             if (text) {
                 let tabs = myNg._getCacheTab(cache);
-                let tab = (text[0] === '\n') ? tabs.tabs : tabs.tabsWithChar;
+                let tab = (key[0] === ' ') ? tabs.tabs : tabs.tabsWithChar;
                 return text.replace(/\n/g, '\n' + tab);
             } else if(text == '') {
                 return '@[__empty__]';
@@ -143,14 +144,14 @@ class NG {
     }
 
     include(filePath, model) {
-        let func = templateEngine.compileFile(filePath);
+        let func = templateEngine.compileFile(filePath.trim());
         // let currentTab = this._currentTab;
         let res = this.__res;
         // this._currentTab = '';
         let result = templateEngine.run({compiled: func, model, scope: this._scope, ng: this}) || '';
         this.__res = res;
         let tabs = this._getTabFromText(res);
-        let tab = (result && result[0] === '\n') ? tabs.tabs : tabs.tabsWithChar;
+        let tab = (filePath && filePath[0] === ' ') ? tabs.tabs : tabs.tabsWithChar;
         return result.replace(/\n/g, '\n' + tab);
     }
 
@@ -164,6 +165,7 @@ class NG {
                 tabs = text[i] + tabs;
                 tabsWithChar = text[i] + tabsWithChar;
             } else{
+                tabs = '';
                 tabsWithChar = ' ' + tabsWithChar;
             }
         }
@@ -175,14 +177,15 @@ class NG {
     }
 
     _setCacheTab(cacheKey) {
+        let cache = cacheKey.trim();
         let tab = this._getTabFromText(this.__res);
-        if (!this._cache[cacheKey]) {
-            this._cache[cacheKey] = {
+        if (!this._cache[cache]) {
+            this._cache[cache] = {
                 tags: {},
                 tab: tab
             };
         } else {
-            this._cache[cacheKey].tab = tab;
+            this._cache[cache].tab = tab;
         }
     }
 

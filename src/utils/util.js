@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 
 const regUpper = /[A-Z]/;
 const regEmpty = /[ _\-\.]/;
@@ -84,6 +85,43 @@ class Util {
             return result.filter(x => x);
         }
         return [text];
+    }
+
+    getMappings({root, baseTemplateDir, templateDir, outputDir, model, seq, scope}) {
+        let myRoot = !root ? process.cwd() : root;
+        let files = this.readAllFiles(this.getPath(myRoot, path.join(baseTemplateDir, templateDir)));
+        return files.map(f => ({
+                scope,
+                seq,
+                model,
+                template: path.join(templateDir, ...f.dirPaths, f.file),
+                output: path.join(outputDir, ...f.dirPaths, f.file)
+            }));
+    }
+    
+    readAllFiles(filePath, dirPaths = []) {
+        let dir = filePath;
+        if (!dir)
+            return [];
+        let files = fs.readdirSync(dir);
+        if (!files)
+            return [];
+        let result = [];
+        for (let file of files) {
+            let pathName = path.join(dir, file);
+            let stats = fs.statSync(pathName);
+            if (!stats)
+                continue;
+            if (stats.isDirectory()) {
+                let res = this.readAllFiles(pathName, [...dirPaths, file]);
+                result.push(...res);
+                continue;
+            }
+            if (stats.isFile()) {
+                result.push({ path: pathName, dirPaths, fileName: file.substring(0, file.lastIndexOf('.')), file });
+            }
+        }
+        return result;
     }
 }
 

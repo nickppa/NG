@@ -23,8 +23,8 @@ class BlockDefineNode{
         let key = '', tag = '';
         let define = this.text.substring(this.text.indexOf('[') + 1, this.text.indexOf(']'));
         var arr = define.split(',');
-        if(arr.length > 0) key = arr[0];
-        if(arr.length > 1) tag = arr[1];
+        if(arr.length > 0) key = arr[0].trim();
+        if(arr.length > 1) tag = arr[1].trim();
         let result = 'let __res' + KKK + ' = ng.__res;ng._setCacheText("' + key + '", "' + tag + '", (function(ng, model){ng.__res = "";';
         for(let node of this.nodes){
             result += (node.generateCode && node.generateCode()) || '';
