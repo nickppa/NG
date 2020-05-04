@@ -264,4 +264,130 @@ describe("templateEngine", function () {
             nodes[7].text.should.equal('sss');
         });
     });
+
+    describe("generateCode", function(){
+        it('should generate code1', function () {
+            let code = templateEngine.compile(`hello @(model.name)!`);
+            templateEngine.run({compiled: code, model: {name: 'aa'}}).should.equal('hello aa!');
+        });
+
+        it('should generate code2', function () {
+            let code = templateEngine.compile(`hello @(model.name)!`);
+            templateEngine.run({compiled: code, model: {name: 'bbb'}}).should.equal('hello bbb!');
+        });
+
+        it('should generate code3', function () {
+            let code = templateEngine.compile(`hello \r\n@(model.name)!`);
+            templateEngine.run({compiled: code, model: {name: 'bbb'}}).should.equal('hello \nbbb!');
+        });
+
+        it('should generate code4', function () {
+            let code = templateEngine.compile(`hello \r\n \t @(model.name)!`);
+            templateEngine.run({compiled: code, model: {name: 'bbb'}}).should.equal('hello \n \t bbb!');
+        });
+
+        it('should generate code5', function () {
+            let code = templateEngine.compile(`hello \r\n \t @{if(model.name){@:@(model.name)\r\n}}!`);
+            templateEngine.run({compiled: code, model: {name: 'bbb'}}).should.equal('hello \n \t bbb!');
+        });
+
+        it('should generate code6', function () {
+            let code = templateEngine.compile(`hello \r\n \t @{if(model.name){@:@(model.name)\r\n}}\r\n!`);
+            templateEngine.run({compiled: code, model: {name: 'bbb'}}).should.equal('hello \n \t bbb\n!');
+        });
+
+        it('should generate code7', function () {
+            let code = templateEngine.compile(`hello \r\n \t @{if(model.name){@:@(model.name)\r\n}}\r\n\t\t!`);
+            templateEngine.run({compiled: code, model: {name: 'bbb'}}).should.equal('hello \n \t bbb\n\t\t!');
+        });
+
+        it('should generate code8', function () {
+            let code = templateEngine.compile(`hello \r\n \t @{if(model.name){@:\t\t\t@(model.name)\r\n}}\r\n\t\t!`);
+            // console.log(code.sourcecode);
+            templateEngine.run({compiled: code, model: {name: 'bbb'}}).should.equal('hello \n \t \t\t\tbbb\n\t\t!');
+        });
+
+        it('should generate code9', function () {
+            let code = templateEngine.compile(`hello \r\n \t @{for(let a of model.arr){@:{\r\n\t\t\t@(a)@:}}}\r\n\t\t!`);
+            //console.log(code.sourcecode);
+            templateEngine.run({compiled: code, model: {arr: ['aaa', 'bbb']}}).should.equal('hello \n \t \n\t\t\taaa\n\t\t\tbbb\n\t\t!');
+        });
+    });
+
+    describe("layout", function(){
+        it('should generate include code1', function () {
+            let code = templateEngine.compile(`hello@(ng.include('test1', model))!`);
+            //console.log(code.sourcecode);
+            templateEngine.run({compiled: code, model: 'xxx'}).should.equal('helloaaaxxxsss!');
+        });
+
+        it('should generate include code2', function () {
+            let code = templateEngine.compile(`hello\r\n\t\t@(ng.include('test2', model))!`);
+            //console.log(code.sourcecode);
+            templateEngine.run({compiled: code, model: 'xxx'}).should.equal('hello\n\t\tasddsa\n\t\tssssss!');
+        });
+    });
+
+    describe("block layout", function(){
+        it('should generate include code1', function () {
+            let code = templateEngine.compile(`@[aaa]hello@(ng.include('test1', model))!`);
+            //console.log(code.sourcecode);
+            templateEngine.run({compiled: code, model: 'xxx'}).should.equal('helloaaaxxxsss!');
+        });
+
+        it('should generate include code2', function () {
+            let code = templateEngine.compile(`@[aaa]
+hello@(ng.include('test1', model))!
+@[aaa]{
+@:222
+}`);
+            //console.log(code.sourcecode);
+            templateEngine.run({compiled: code, model: 'xxx'}).should.equal('222\nhelloaaaxxxsss!');
+        });
+
+        it('should generate include code3', function () {
+            let code = templateEngine.compile(`\t\t@[aaa]
+hello@(ng.include('test1', model))!
+@[aaa]{
+@:{222
+111@:}
+}`);
+            //console.log(code.sourcecode);
+            templateEngine.run({compiled: code, model: 'xxx'}).should.equal('\t\t222\n\t\t111\nhelloaaaxxxsss!');
+        });
+
+        it('should generate include code4', function () {
+            let code = templateEngine.compile(`\t\t@[aaa]
+hello@(ng.include('test1', model))!
+@[aaa]{
+@:{222
+111
+@:}
+}`);
+            //console.log(code.sourcecode);
+            templateEngine.run({compiled: code, model: 'xxx'}).should.equal('\t\t222\n\t\t111\n\t\t\nhelloaaaxxxsss!');
+        });
+
+        it('should generate include code5', function () {
+            let code = templateEngine.compile(`\t\t@[aaa]
+hello@(ng.include('test1', model))!
+@[aaa]{
+@:222
+}`);
+            //console.log(code.sourcecode);
+            templateEngine.run({compiled: code, model: 'xxx'}).should.equal('\t\t222\nhelloaaaxxxsss!');
+        });
+
+        it('should generate include code6', function () {
+            let code = templateEngine.compile(`\t\t@[aaa]
+hello@(ng.include('test1', model))!@[bbb]
+@[bbb]{
+}
+@[aaa]{
+@:222
+}`);
+            //console.log(code.sourcecode);
+            templateEngine.run({compiled: code, model: 'xxx'}).should.equal('\t\t222\nhelloaaaxxxsss!');
+        });
+    });
 })

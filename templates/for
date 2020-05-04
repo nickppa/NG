@@ -1,0 +1,9 @@
+@{
+    if(model && model.arr && model.arr.length){
+        for(let i in model.arr){
+            let item = model.arr[i];
+            let split = i == 0 ? '' : (model.split || '');
+@(split)@(ng.include(model.template, item))
+        }
+    }
+}

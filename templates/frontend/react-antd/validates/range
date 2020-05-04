@@ -1,0 +1,9 @@
+rangeValidate = (rule, value, callback) => {
+    const { form } = this.props;
+	const { min, max, message } = rule;
+    if (value && (((max || max === 0) && value > max) || ((min || min === 0) && value < min))) {
+        callback(message);
+    } else {
+        callback();
+    }
+};

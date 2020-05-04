@@ -1,0 +1,37 @@
+@{
+    if(model.type === 'required')
+    {
+@:@!{required: true, message: '@(model.message)'}
+    }
+    else if(model.type === 'compare')
+    {
+        @[js,compare]{@(ng.include('frontend/react-antd/validates/compare-to'))}
+@:@!{validator: this.compareToValidate, compareTo: '@(model.compareTo)', message: '@(model.message)'}
+    }
+    else if(model.type === 'maxLength')
+    {
+@:@!{max: @(model.maxLength), message: '@(model.message)'}
+    }
+    else if(model.type === 'minLength')
+    {
+@:@!{min: @(model.minLength), message: '@(model.message)'}
+    }
+    else if(model.type === 'pattern')
+    {
+@:@!{pattern: /@(model.pattern)/, message: '@(model.message)'}
+    }
+    else if(model.type === 'url')
+    {
+@:@!{pattern: /^(http:\/\/|https:\/\/|ftp:\/\/)/, message: '@(model.message)'}
+    }
+    else if(model.type === 'email')
+    {
+        @[js,email]{@(ng.include('frontend/react-antd/validates/email'))}
+@:@!{validator: this.emailValidate, message: '@(model.message)'}
+    }
+    else if(model.type === 'range')
+    {
+        @[js,range]{@(ng.include('frontend/react-antd/validates/range'))}
+@:@!{validator: this.rangeValidate, max: @model.max, min: @model.min, message: '@(model.message)'}
+    }
+}

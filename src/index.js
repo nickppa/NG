@@ -1,4 +1,3 @@
-const path = require('path');
 const Generator = require('./utils/generator');
 const util = require('./utils/util');
 const file = require('./utils/file');

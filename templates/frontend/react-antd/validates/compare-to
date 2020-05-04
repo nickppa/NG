@@ -1,0 +1,9 @@
+compareToValidate = (rule, value, callback) => {
+    const { form } = this.props;
+	const { compareTo, message } = rule;
+    if (value && value !== form.getFieldValue(compareTo)) {
+        callback(message);
+    } else {
+        callback();
+    }
+};

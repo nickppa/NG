@@ -1,0 +1,18 @@
+emailValidate = (rule, value, callback) => {
+    const { form } = this.props;
+	const { message } = rule;
+	if(!value){
+        callback();
+		return;
+	}
+	if(typeof value !== 'string'){
+		callback(message);
+		return;
+	}
+	const index = value.indexOf('@@');
+	const lastIndex = value.lastIndexOf('@@');
+	if(index > 0 && index != value.length - 1 && index == lastIndex)
+        callback();
+	else
+		callback(message);
+};

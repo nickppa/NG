@@ -1,0 +1,10 @@
+@[antd,input]{@:{,Input@:}}
+<Form.Item label="@(model.display)" {...formItemLayout}>
+    {getFieldDecorator('@(model.name)', {
+        rules: [@(ng.include('for', {arr: model.rules, template: 'frontend/react-antd/create/rule', split: ',\n'}))]
+    })(
+        <Input @(model.isPassword ? ' type="password"' : '')
+            placeholder="@(model.display)"
+        />
+    )}
+</Form.Item>
