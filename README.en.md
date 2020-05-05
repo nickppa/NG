@@ -211,4 +211,4 @@ module.exports = OrderDetail;
 | template | string | the path of the template, relative to the template directory of the configuration |
 | output | string | the path of the output file, relative to the output directory of the configuration |
 
-The __scope__ supported the tree mode which is splited by ```.```, for example, ```root``` can contains ```root.module1``` and ```root.module1.module1_1```, if you defined ```@[p]{<code>}``` in the template of the scope```root.module1```, then in the template of the scope```root``` can use the content of the place holder ```@[p]```.
+The __scope__ supported the tree mode which is splited by ```.```, for example, ```root``` can contains ```root.module1``` and ```root.module1.module1_1```, if you defined ```@[p]{<code>}``` in the template of the scope```root.module1```, then in the template of the scope```root``` can use the content for the place holder ```@[p]```.
