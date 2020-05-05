@@ -206,7 +206,7 @@ module.exports = OrderDetail;
 | Name | Type | Description |
 | --- | --- | --- |
 | scope | string | ng's scope |
-| seq | number | the generate sequence of the template, if the number is lower, it will generate firstly |
+| seq | number | the generate sequence of the template, if the number is lower, it will be generated earlier |
 | model | object | the data model object |
 | template | string | the path of the template, relative to the template directory of the configuration |
 | output | string | the path of the output file, relative to the output directory of the configuration |
