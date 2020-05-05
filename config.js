@@ -7,7 +7,6 @@ const global = {
 };
 
 module.exports = {
-    debug: true,
     root,
     outputDir: "output",
     deleteOutput: true,
