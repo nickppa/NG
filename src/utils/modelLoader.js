@@ -22,11 +22,13 @@ class ModelLoader {
             model._props = { name: model.constructor.name };
         }
         model._path = f.path;
+        model._fileName = f.fileName;
+        model._file = f.file;
         model._dirPaths = f.dirPaths;
         for (let i in model) {
             if (i[0] == '_')
                 continue;
-            if(typeof model[i] === 'string')
+            if(typeof model[i] !== 'object')
                 continue;
             model[i].name = i;
             if (model[i].ref) {

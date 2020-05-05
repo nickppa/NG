@@ -30,8 +30,9 @@ class File {
     getModelFile(filePath) {
         let dirPaths = filePath.split('/').slice(0, -1);
         let fileName = filePath.split('/').slice(-1)[0] || '';
+        let file = fileName;
         fileName = fileName.substring(0, fileName.lastIndexOf('.'));
-        return { path: this._getPath(path.join(this.config.modelsDir, filePath)), dirPaths, fileName };
+        return { path: this._getPath(path.join(this.config.modelsDir, filePath)), dirPaths, fileName, file };
     }
 
     output({ filePath, data }) {
