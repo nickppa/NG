@@ -2,7 +2,6 @@ const Generator = require('./utils/generator');
 const util = require('./utils/util');
 const file = require('./utils/file');
 const modelLoader = require('./utils/modelLoader');
-const { v4: uuidv4 } = require('uuid');
 
 let configPath = '';
 const configTag = "--myconfig=";
@@ -38,9 +37,6 @@ const baseHelper = {
     },
     toSnakeCase: (...args) => {
         return util.toSnakeCase(...args);
-    },
-    uuid: () => {
-        return uuidv4();
     }
 };
 
