@@ -2,7 +2,7 @@
   "name": "ng",
   "version": "1.0.0",
   "description": "A code generator platform to generate code",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "start": "babel-node src/index.js --myconfig=config.js",
     "test": "mocha ./tests/**/*.js --watch"
