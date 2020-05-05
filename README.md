@@ -200,7 +200,7 @@ module.exports = OrderDetail;
 | customFieldProp | function | 输入参数为模型对象的成员，用户可在该function中，对系统生成的模型中的对象类型的成员进行修改，可修改添加属性 |
 | global | 对象 | 全局变量，用户可在模版中直接调用这里定义的全局变量，如global.appName |
 | mapping | function | "连接器"，输入参数为模型对象，用户需要返回对象数组，来指定模型，和输出的路径 |
-### 返回的模型对象
+### 连接器返回的模型对象
 | 名字 | 类型 | 说明 |
 | --- | --- | --- |
 | scope | 字符串 | ng的范围 |
