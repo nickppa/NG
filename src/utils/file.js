@@ -23,6 +23,10 @@ class File {
         return this._getPath(path.join(this.config.templateDir, filePath));
     }
 
+    getOutputPath(filePath) {
+        return this._getPath(path.join(this.config.outputDir, filePath));
+    }
+
     readAllModels() {
         return this.readAllFiles(this.config.modelsDir);
     }
@@ -65,7 +69,6 @@ class File {
                         resolve();
                         return;
                     }
-                    console.log(`output...${p}`);
                     resolve();
                 });
             }).catch(err => {
@@ -90,6 +93,10 @@ class File {
             })
         }
         fs.rmdirSync(dirPath);
+    }
+
+    copy(from, to) {
+        fs.createReadStream(from).pipe(fs.createWriteStream(to));
     }
 
     async readAllFiles(filePath, dirPaths = []) {

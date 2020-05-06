@@ -195,11 +195,11 @@ module.exports = OrderDetail;
 | deleteOutput | 布尔值 | 生成代码时是否清空输出目录 |
 | modelsDir | 字符串 | 模型目录，系统会遍历整个模型目录中的模型文件，包括子目录 |
 | templateDir | 字符串 | 模板目录 |
-| helper | 对象 | 用户可自定义function, 在模板中可使用```ng.自定义function```来调用这里自定义的function |
-| customModelProp | function | 输入参数为模型对象，用户可在该function中，对系统生成的模型进行修改，可修改添加属性，当然，使用delete，也可删除属性 |
-| customFieldProp | function | 输入参数为模型对象的成员，用户可在该function中，对系统生成的模型中的对象类型的成员进行修改，可修改添加属性 |
+| helper | 对象 | 用户可自定义函数, 在模板中可使用```ng.自定义函数```来调用这里自定义的function |
+| customModelProp | 函数 | 输入参数为模型对象，用户可在该function中，对系统生成的模型进行修改，可修改添加属性，当然，使用delete，也可删除属性 |
+| customFieldProp | 函数 | 输入参数为模型对象的成员，用户可在该function中，对系统生成的模型中的对象类型的成员进行修改，可修改添加属性 |
 | global | 对象 | 全局变量，用户可在模板中直接调用这里定义的全局变量，如global.appName |
-| mapping | function | "连接器"，输入参数为模型对象，用户需要返回对象数组，来指定模型，和输出的路径 |
+| mapping | 函数 | "连接器"，输入参数为模型对象，用户需要返回对象数组，来指定模型，和输出的路径 |
 ### 连接器返回的模型对象
 | 名字 | 类型 | 说明 |
 | --- | --- | --- |
@@ -208,5 +208,6 @@ module.exports = OrderDetail;
 | model | 对象 | 模型对象 |
 | template | 字符串 | 模板路径，相对于配置中模板目录的相对路径 |
 | output | 字符串 | 输出路径，相对于配置中输出目录的相对路径 |
+| noRender | 布尔值 | 如果该字段为true, 则不会使用模板引擎进行渲染，会直接将文件拷贝到目标位置 |
 
 scope支持以```.```分隔开的树形模式，例如```root```能包含```root.module1```, ```root.module1.module1_1```，如果你在scope```root.module1```中的模板中有定义```@[p]{<code>}```，那么在scope```root```所定义的模板中就能使用到```@[p]```的内容

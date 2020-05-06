@@ -68,6 +68,11 @@ async function main(){
     console.log(`begin generate`);
     for(let m of allMappings){
         console.log(`--processing template ${m.template}`);
+        if(m.noRender){
+            file.copy(file.getTemplatePath(m.template), file.getOutputPath(m.output));
+            console.log(`copied to ${m.output}`);
+            continue;
+        }
         const text = generator.render({filePath: m.template, model: m.model, scope: m.scope});
         await file.output({filePath: m.output, data: text});
         console.log(`output to ${m.output}`);

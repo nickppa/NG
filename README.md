@@ -210,5 +210,6 @@ module.exports = OrderDetail;
 | model | object | the data model object |
 | template | string | the path of the template, relative to the template directory of the configuration |
 | output | string | the path of the output file, relative to the output directory of the configuration |
+| noRender | bool | if this is set to true, it will not render the template, but only copy the file to output position |
 
 The __scope__ supported the tree mode which is splited by ```.```, for example, ```root``` can contains ```root.module1``` and ```root.module1.module1_1```, if you defined ```@[p]{<code>}``` in the template of the scope```root.module1```, then in the template of the scope```root``` can use the content for the place holder ```@[p]```.

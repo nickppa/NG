@@ -87,15 +87,13 @@ class Util {
         return [text];
     }
 
-    getMappings({root, baseTemplateDir, templateDir, outputDir, model, seq, scope}) {
+    getMappings({root, baseTemplateDir, templateDir, outputDir, ...props}) {
         let myRoot = !root ? process.cwd() : root;
         let files = this.readAllFiles(this.getPath(myRoot, path.join(baseTemplateDir, templateDir)));
         return files.map(f => ({
-                scope,
-                seq,
-                model,
                 template: path.join(templateDir, ...f.dirPaths, f.fullFileName),
-                output: path.join(outputDir, ...f.dirPaths, f.fullFileName)
+                output: path.join(outputDir, ...f.dirPaths, f.fullFileName),
+                ...props
             }));
     }
     
