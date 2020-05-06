@@ -1,27 +1,28 @@
 # NG
 
-## 理念
-该代码生成系统分为三部分，模型、模板和连接器，用户可自由定义自己的模型，规则，并按照这个规则，由自己定义代码模板，我认为一个由用户自己定义的代码生成模板才是最好的模板，通过连接器将模型和模板进行连接，并指定生成文件的路径。
+## Ideas
+This code generater system has three parts: data model, template and the connector, the user can define his own data model, rules, and create the custom template by following these rules. I think the best template is the user's own template, because he knows his requirement best.
+At last, the user can use connector to connect the data model and template together to generate the code.
 
-## 模板
-### 语法
-类似于razor语法，参考了vash，针对于代码生成，会比较在意代码缩进换行的格式，因此自定义了一套模板的语法，用了jade中用到的词法分析器
-1. 输出型代码，使用```@(<code>)```
-    例：```@(model.name)```
-2. 逻辑代码块，使用```@{<code>}```
-    例：
+## The template
+### Grammar
+This is like razor, I've read the source code of vash(https://github.com/kirbysayshi/vash), its focus is generate html file, so it will the format of the template, but for the code generater, I will focus on the code format, so I redesigned a new template engine, use the lexer code from jade, like vash did.
+1. The output code, means it will generate out the text, use```@(<code>)```
+    For example: ```@(model.name)```
+2. The logical code block, use```@{<code>}```
+    For example:
     ```
     @{
         let pName = ng.toPascalCase(name);
     }
     ```
-3. 行内文本，使用```@:<text>\n```，输出的文本不会在末位加上换行符
-4. 文本块，使用```@:{<text>@:}```
-5. 转义，使用```@@```，代表@
-6. 截断符, ```@!```，如需要以单行文本形式输出{xxx}，会使用```@:{xxx}```,但```@:{```与逻辑代码块的标识冲突了，可以加入截断符```@:@!{xxx}```来输出{xxx}
-更多的例子
+3. The inline text, use```@:<text>\n```, the output text will not end with ```\n```
+4. The text block, use```@:{<text>@:}```
+5. Escaping, use```@@```instead of ```@```
+6. Truncation, ```@!```, if you want tot output an inline text```{xxx}```, you will use```@:{xxx}```, but```@:{```means the begining of the logical code block, so you can add truncation, like this:```@:@!{xxx}```to output ```{xxx}```
 
-for循环的模板：
+more examples
+the __for__ template：
 ```
 @{
     if(model && model.arr && model.arr.length){
@@ -34,20 +35,20 @@ for循环的模板：
 }
 ```
 
-### 布局
-暂时没有加入母版的概念，因为还不需要
+### The layout
+Not implement master page currently, because I don't think it will help mush.
 
-#### 子模板
-子模板使用```ng.include(<子模板filePath>, <model>)```
+#### Sub-Template
+The sub template use```ng.include(<sub-template's file path>, <model>)```
 
-#### 占位符
-占位符会延迟输出，等到整个template生成完以后才会将内容替换。
-1. 使用```@[<placeHolderName>]```来放置占位符
-2. 使用```@[<placeHolderName>(,<tag>)]{<code>}```来定义占位符中的内容
-##### 占位符中tag的作用
-一般定义占位符内容时，如果没有指定tag，默认就会将内容添加到占位符中
-例如存在```@[p]```
-在模板的两个位置定义了这个占位符的内容
+#### Place holder
+The place holder will generate the text at the last moment, it will be replaced when the whole template is finishing its generation.
+1. Use ```@[<placeHolderName>]``` to set the place holder
+2. Use ```@[<placeHolderName>(,<tag>)]{<code>}```to define the content of the place holder
+##### The tag inside the place holder
+If you didn't use the ```tag``` in the place holder, it will append the text to the place holder.
+For example, if exists ```@[p]``` in the template
+and we defined its content at two place of the template:
 ```
 @[p]{
 @:paragraph1
@@ -56,8 +57,9 @@ for循环的模板：
 @:paragraph2
 }
 ```
-那么最终在```@[p]```的位置，输出的文本会是```paragraph1paragraph2```
-如果加入了tag，相同tag的只会添加一次
+At last we will get the text ```paragraph1paragraph2``` at the position of the ```@[p]```
+If we use the tag in place holder, the same tag will only append once
+for example:
 ```
 @[p,tag1]{
 @:paragraph1
@@ -69,12 +71,12 @@ for循环的模板：
 @:paragraph3
 }
 ```
-那么最终在```@[p]```的位置，输出的文本会是```paragraph1paragraph3```，第二段定义会被忽略
+We will get the text ```paragraph1paragraph3``` at the ```@[p]``` finally, the 2nd one will be ignored.
 
-#### 换行缩进
-可以在```ng.include```和```@[<placeHolderName>]```中加入空格进行换行缩进的模式切换，具体如下：
+#### Wrap & indent
+We can add space to the ```ng.include``` and ```@[<placeHolderName>]```to switch the mode, see the details as below：
 ##### ```ng.include```
-例子：
+For example:
 ```
 <Form.Item label="@(model.display)" {...formItemLayout}>
     {getFieldDecorator('@(model.name)', {
@@ -86,7 +88,7 @@ for循环的模板：
     )}
 </Form.Item>
 ```
-其中```ng.include(' for'```代码中在"子模板filePath"前面加入了空格，那么输出时会是这种效果：
+The code ```ng.include(' for'``` added a space at the front of the "sub-template file path", so the output will be：
 ```
 <Form.Item label="Name1" {...formItemLayout}>
     {getFieldDecorator('ccc', {
@@ -99,7 +101,7 @@ for循环的模板：
     )}
 </Form.Item>
 ```
-如果去掉空格：
+If we remove the space：
 ```
 <Form.Item label="@(model.display)" {...formItemLayout}>
     {getFieldDecorator('@(model.name)', {
@@ -111,7 +113,7 @@ for循环的模板：
     )}
 </Form.Item>
 ```
-结果会是
+The result will be:
 ```
 <Form.Item label="Name1" {...formItemLayout}>
     {getFieldDecorator('ccc', {
@@ -124,36 +126,36 @@ for循环的模板：
     )}
 </Form.Item>
 ```
-也就是如果前面加了空格，那换行时的缩进就只会对齐到该行的空格部分；
-如果不加空格，换行时缩进就会对齐到文字部分
+That means if we added a space at the front of the sub-template's file path, when wrap, the indent will set to the line's space part;
+If not so, when wrapped, the indent will set to the text part.
 ##### ```@[<placeHolderName>]```
-占位符也遵循同样的规则
-例子：
-占位符：
+The place holder will follow this rule
+For example:
+The place holder
 ```
 import {
     Form@[ antd]
 } from 'antd';
 ```
-占位符的内容定义：
+The define of the place holder
 ```
 @[antd,input]{@:{,
 Input@:}}
 ```
-带空格时，输出：
+if has space, it will output
 ```
 import {
     Form,
     Input
 } from 'antd';
 ```
-如果去掉空格
+if removed the space
 ```
 import {
     Form@[antd]
 } from 'antd';
 ```
-结果会是
+The result will be like this
 ```
 import {
     Form,
@@ -161,20 +163,20 @@ import {
 } from 'antd';
 ```
 
-## 模型
-可自由定义js模型，各种规则可自由约定。
-### 内置属性
-#### 模型本身
-| 名字 | 类型 | 说明 |
+## The model
+Feel free to define the custom js data model, also the rules.
+### The build-in properties
+#### The data model
+| Name | Type | Description |
 | --- | --- | --- |
-| _path | 字符串 | 文件路径 |
-| _fileName | 字符串 | 文件名，不带扩展名 |
-| _file | 字符串 | 文件名，带扩展名 |
-| _dirPaths | 字符串数组 | 文件夹路径数组，相对于模型根目录 |
-| _props.name | 字符串 | 类名 |
-#### 模型成员
-对于对象类型的成员
-_ref: 若定义了```ref: '<filePath>'```（这里的```<filePath>```是相对于配置中的模型文件夹的相对路径），_ref则会指向相应的模型
+| _path | ```string``` | the path of the file |
+| _fileName | ```string``` | the name of the file without extension |
+| _file | ```string``` | the name of the file with extension |
+| _dirPaths | ```string[]``` | the string array of the folder path, relative to the data model's directory |
+| _props.name | ```string``` | the class name |
+#### The fields of the data model
+for the object type
+_ref: if you defined ```ref: '<filePath>'```(The ```<filePath>``` here is a relative path to the data model's directory), the _ref property will point to the specific data model
 ```
 class OrderDetail{
     ccc = {
@@ -187,26 +189,26 @@ class OrderDetail{
 module.exports = OrderDetail;
 ```
 
-## 配置文件（包含连接器）
-| 名字 | 类型 | 说明 |
+## Configuration(including the connector)
+| Name | Type | Description |
 | --- | --- | --- |
-| root | 字符串 | 根目录，若为空，则会使用process.cwd()作为根目录 |
-| outputDir | 字符串 | 输出目录 |
-| deleteOutput | 布尔值 | 生成代码时是否清空输出目录 |
-| modelsDir | 字符串 | 模型目录，系统会遍历整个模型目录中的模型文件，包括子目录 |
-| templateDir | 字符串 | 模板目录 |
-| helper | 对象 | 用户可自定义function, 在模板中可使用```ng.自定义function```来调用这里自定义的function |
-| customModelProp | function | 输入参数为模型对象，用户可在该function中，对系统生成的模型进行修改，可修改添加属性，当然，使用delete，也可删除属性 |
-| customFieldProp | function | 输入参数为模型对象的成员，用户可在该function中，对系统生成的模型中的对象类型的成员进行修改，可修改添加属性 |
-| global | 对象 | 全局变量，用户可在模板中直接调用这里定义的全局变量，如global.appName |
-| mapping | function | "连接器"，输入参数为模型对象，用户需要返回对象数组，来指定模型，和输出的路径 |
-### 连接器返回的模型对象
-| 名字 | 类型 | 说明 |
+| root | string | the root directory, if it is empty, it will use ```process.cwd()``` to be the root directory |
+| outputDir | string | the output directory |
+| deleteOutput | bool | whether to clean the folder before generate the code |
+| modelsDir | string | the directory of the data model, the system will walk through all the files under the directory, including the sub directory |
+| templateDir | string | the template directory |
+| helper | object | the user can define his own function, in the template we can use ```ng.myFunction``` to call the function here |
+| customModelProp | function | the input parameter is the data model object, the user can change the model here |
+| customFieldProp | function | the input parameter is the data model object's field, the user can modify the field here |
+| global | object | the global variable, user can use it in the template, for example: ```global.appName``` |
+| mapping | function | __connector__, the input parameter is the data model object, the user need to return an object array to deine the data model and the output path |
+### The data structure of the connector's returned object
+| Name | Type | Description |
 | --- | --- | --- |
-| scope | 字符串 | ng的范围 |
-| seq | 数字 | 生成的顺序，数字越小，越先生成 |
-| model | 对象 | 模型对象 |
-| template | 字符串 | 模板路径，相对于配置中模板目录的相对路径 |
-| output | 字符串 | 输出路径，相对于配置中输出目录的相对路径 |
+| scope | string | ng's scope |
+| seq | number | the generate sequence of the template, if the number is lower, it will be generated earlier |
+| model | object | the data model object |
+| template | string | the path of the template, relative to the template directory of the configuration |
+| output | string | the path of the output file, relative to the output directory of the configuration |
 
-scope支持以```.```分隔开的树形模式，例如```root```能包含```root.module1```, ```root.module1.module1_1```，如果你在scope```root.module1```中的模板中有定义```@[p]{<code>}```，那么在scope```root```所定义的模板中就能使用到```@[p]```的内容
+The __scope__ supported the tree mode which is splited by ```.```, for example, ```root``` can contains ```root.module1``` and ```root.module1.module1_1```, if you defined ```@[p]{<code>}``` in the template of the scope```root.module1```, then in the template of the scope```root``` can use the content for the place holder ```@[p]```.
