@@ -94,8 +94,8 @@ class Util {
                 scope,
                 seq,
                 model,
-                template: path.join(templateDir, ...f.dirPaths, f.file),
-                output: path.join(outputDir, ...f.dirPaths, f.file)
+                template: path.join(templateDir, ...f.dirPaths, f.fullFileName),
+                output: path.join(outputDir, ...f.dirPaths, f.fullFileName)
             }));
     }
     
@@ -118,7 +118,7 @@ class Util {
                 continue;
             }
             if (stats.isFile()) {
-                result.push({ path: pathName, dirPaths, fileName: file.substring(0, file.lastIndexOf('.')), file });
+                result.push({ path: pathName, dirPaths, fileName: file.substring(0, file.lastIndexOf('.')), fullFileName: file });
             }
         }
         return result;

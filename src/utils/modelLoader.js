@@ -23,7 +23,7 @@ class ModelLoader {
         }
         model._path = f.path;
         model._fileName = f.fileName;
-        model._file = f.file;
+        model._fullFileName = f.fullFileName;
         model._dirPaths = f.dirPaths;
         for (let i in model) {
             if (i[0] == '_')

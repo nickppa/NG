@@ -30,9 +30,9 @@ class File {
     getModelFile(filePath) {
         let dirPaths = filePath.split('/').slice(0, -1);
         let fileName = filePath.split('/').slice(-1)[0] || '';
-        let file = fileName;
+        let fullFileName = fileName;
         fileName = fileName.substring(0, fileName.lastIndexOf('.'));
-        return { path: this._getPath(path.join(this.config.modelsDir, filePath)), dirPaths, fileName, file };
+        return { path: this._getPath(path.join(this.config.modelsDir, filePath)), dirPaths, fileName, fullFileName };
     }
 
     output({ filePath, data }) {
@@ -111,7 +111,7 @@ class File {
                 continue;
             }
             if (stats.isFile()) {
-                result.push({ path: pathName, dirPaths, fileName: file.substring(0, file.lastIndexOf('.')), file });
+                result.push({ path: pathName, dirPaths, fileName: file.substring(0, file.lastIndexOf('.')), fullFileName: file });
             }
         }
         return result;

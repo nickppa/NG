@@ -22,7 +22,7 @@ This is like razor, I've read the source code of vash(https://github.com/kirbysa
 6. Truncation, ```@!```, if you want tot output an inline text```{xxx}```, you will use```@:{xxx}```, but```@:{```means the begining of the logical code block, so you can add truncation, like this:```@:@!{xxx}```to output ```{xxx}```
 
 more examples
-the __for__ template：
+the __for__ template:
 ```
 @{
     if(model && model.arr && model.arr.length){
@@ -171,7 +171,7 @@ Feel free to define the custom js data model, also the rules.
 | --- | --- | --- |
 | _path | ```string``` | the path of the file |
 | _fileName | ```string``` | the name of the file without extension |
-| _file | ```string``` | the name of the file with extension |
+| _fullFileName | ```string``` | the name of the file with extension |
 | _dirPaths | ```string[]``` | the string array of the folder path, relative to the data model's directory |
 | _props.name | ```string``` | the class name |
 #### The fields of the data model
