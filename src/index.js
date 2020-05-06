@@ -13,7 +13,7 @@ process.argv.forEach(function (val, index, array) {
 });
 
 if(!configPath){
-    console.error('must have --myconfig=xxx argument');
+    console.error('it must have --myconfig=xxx argument');
     process.exit();
 }
 
@@ -52,7 +52,8 @@ async function main(){
     let allMappings = [];
     console.log(`begin load models`);
     for(let f of files){
-        let model = modelLoader.getModel(f)
+        let model = modelLoader.getModel(f);
+        if(model === null) continue;
         let mappings = mapping(model);
         allMappings.push(...mappings);
     }

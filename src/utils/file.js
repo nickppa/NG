@@ -43,7 +43,7 @@ class File {
         return new Promise((resolve, reject) => {
             fs.readFile(this._getPath(filePath), 'utf8', (err, data) => {
                 if (err) {
-                    console.error(`error in read file: ${filePath}`, err);
+                    console.error(`An error happened when reading the file: ${filePath}`, err);
                     resolve('');
                     return;
                 }
@@ -61,7 +61,7 @@ class File {
                 }
                 fs.writeFile(p, text, 'utf8', err => {
                     if (err) {
-                        console.error(`error in write file: ${p}`, err);
+                        console.error(`An error happened when writting the file: ${p}`, err);
                         resolve();
                         return;
                     }
@@ -69,7 +69,7 @@ class File {
                     resolve();
                 });
             }).catch(err => {
-                console.error(`error in writeFile: ${filePath}`, err);
+                console.error(`An error happened in the 'writeFile' function: ${filePath}`, err);
                 reject(err);
             });
         });
@@ -121,7 +121,7 @@ class File {
         return new Promise((resolve, reject) => {
             fs.stat(filePath, (err, stats) => {
                 if (err) {
-                    console.error(`error in get stat: ${pathName}`, err);
+                    console.error(`An error happened when getting the stat: ${pathName}`, err);
                     resolve();
                     return;
                 }
@@ -134,7 +134,7 @@ class File {
         return new Promise((resolve, reject) => {
             fs.readdir(dir, (err, files) => {
                 if (err) {
-                    console.error(`error in read dir: ${dir}`, err);
+                    console.error(`An error happened when reading the dir: ${dir}`, err);
                     resolve();
                     return;
                 }
@@ -150,7 +150,7 @@ class File {
                 if (err) {
                     fs.mkdir(dir, { recursive: true }, (err) => {
                         if (err) {
-                            console.error(`error in create dir: ${dir}`, err);
+                            console.error(`An error happened when creating the directory: ${dir}`, err);
                             resolve(null);
                             return;
                         }

@@ -17,16 +17,21 @@ class TemplateEngine {
         if (this._cache[filePath])
             return this._cache[filePath];
         let text = fs.readFileSync(this._getPath(filePath), { encoding: 'utf8' });
-        this._cache[filePath] = this.compile(text);
+        this._cache[filePath] = this.compile(text, filePath);
         return this._cache[filePath];
     }
 
-    compile(template) {
+    compile(template, filePath = '') {
         let result = this.generateCode(this.clean(this.preCompile(template)));
-        let func = new Function("ng", "global", "model", result.code);
-        func.sourcecode = result.code;
-        func.rootNode = result.rootNode;
-        return func;
+        try {
+            let func = new Function("ng", "global", "model", result.code);
+            func.sourcecode = result.code;
+            func.rootNode = result.rootNode;
+            func.path = filePath;
+            return func;
+        } catch (err) {
+            console.error(`An error happened when compiling the template ${filePath}.`, { err, template });
+        }
     }
 
     run({compiled, model, scope, ng = null}) {
@@ -34,7 +39,12 @@ class TemplateEngine {
         if (!myNg) {
             myNg = this.initNg(scope);
         }
-        let result = compiled(myNg, this.config.global, model);
+        let result = '';
+        try{
+            result = compiled(myNg, this.config.global, model);
+        } catch (err) {
+            console.error(`An error happened when running the compiled template ${compiled.path}.`, { err, sourcecode: compiled.sourcecode });
+        }
         let pattern = /@\[(?<key> ?[_$a-zA-Z0-9\xA0-\uFFFF]+)\]/g;
         result = result.replace(pattern, (m, key)=>{
             let cache = (key || '').trim();
@@ -145,9 +155,8 @@ class NG {
 
     include(filePath, model) {
         let func = templateEngine.compileFile(filePath.trim());
-        // let currentTab = this._currentTab;
         let res = this.__res;
-        // this._currentTab = '';
+        if(func === null) return '';
         let result = templateEngine.run({compiled: func, model, scope: this._scope, ng: this}) || '';
         this.__res = res;
         let tabs = this._getTabFromText(res);

@@ -13,8 +13,16 @@ class ModelLoader {
     getModel(f) {
         if (this._modelCache[f.path])
             return this._modelCache[f.path];
-        let Class = require(f.path);
-        let model = new Class();
+        let model = null;
+        try{
+            let Class = require(f.path);
+            if(Class.constructor && typeof Class.constructor === 'function'){
+                model = new Class();
+            }
+        } catch (err) {
+            console.error(`An error happened when loading the model ${f.path}.`, err);
+        }
+        if(model === null) return null;
         this._modelCache[f.path] = model;
         if (model._props) {
             model._props.name = model.constructor.name;
