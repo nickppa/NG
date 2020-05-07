@@ -96,6 +96,11 @@ class Util {
                 ...props
             }));
     }
+
+    readAllTemplates({root, baseTemplateDir, templateDir}) {
+        let myRoot = !root ? process.cwd() : root;
+        return this.readAllFiles(this.getPath(myRoot, path.join(baseTemplateDir, templateDir)));
+    }
     
     readAllFiles(filePath, dirPaths = []) {
         let dir = filePath;
