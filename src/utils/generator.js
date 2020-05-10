@@ -1,16 +1,17 @@
-const file = require('./file');
-const path = require('path');
-const templateEngine = require('../templateEngine');
+const TemplateEngine = require('../templateEngine');
 
 class Generator{
     constructor(config){
-        templateEngine.config = { root: file.getTemplateDir(), global: config.global };
-        templateEngine.helper = config.helper;
+        this.templateEngine = new TemplateEngine({ 
+            root: config.templateDir, 
+            global: config.global,
+            helper: config.helper
+        });
     }
 
     render({filePath, model, scope}){
-        let tpl = templateEngine.compileFile(filePath);
-        return templateEngine.run({compiled: tpl, model, scope});
+        let tpl = this.templateEngine.compileFile(filePath);
+        return this.templateEngine.run({compiled: tpl, model, scope});
     }
 }
 

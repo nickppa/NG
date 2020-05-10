@@ -23,7 +23,7 @@ module.exports = {
     customFieldProp: function (field) {
     },
     global,
-    mapping: function (model) {
+    mapping: async function (model) {
         if (model._props && model._props.type === 'edit') {
             return [{
                 scope: `root.${model._props.modelName}`,

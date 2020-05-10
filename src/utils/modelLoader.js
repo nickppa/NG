@@ -1,13 +1,8 @@
-const file = require('./file');
-
 class ModelLoader {
-    constructor(config) {
+    constructor(config, file) {
         this._modelCache = {};
         this.config = config;
-    }
-
-    getModelFile(filePath) {
-        return this.getModel(file.getModelFile(filePath))
+        this.file = file;
     }
 
     getModel(f) {
@@ -40,7 +35,7 @@ class ModelLoader {
                 continue;
             model[i].name = i;
             if (model[i].ref) {
-                model[i]._ref = this.getModelFile(model[i].ref);
+                model[i]._ref = this.getModel(this.file.getModelFile(model[i].ref));
             }
             if (model.__proto__[i]) {
                 let names = Object.getOwnPropertyNames(model.__proto__[i]);
@@ -57,4 +52,4 @@ class ModelLoader {
     }
 }
 
-module.exports = new ModelLoader();
+module.exports = ModelLoader;

@@ -2,6 +2,7 @@ const Lexer = require('./lexer');
 const Parser = require('./parser');
 const Cleaner = require('./cleaner');
 const CodeGen = require('./codeGen');
+const NG = require('./ng');
 const path = require('path');
 const fs = require('fs');
 
@@ -9,8 +10,7 @@ class TemplateEngine {
     constructor(config) {
         this.config = config;
         this._cache = {};
-        this.helper = {};
-        this.scopeNgs = {};
+        this._scopeNgs = {};
     }
 
     compileFile(filePath) {
@@ -71,15 +71,15 @@ class TemplateEngine {
             if(cache == null){
                 return null;
             }
-            return getCacheText(cache);
+            return NG.GetCacheText(cache);
         }
-        let scopes = Object.getOwnPropertyNames(this.scopeNgs);
+        let scopes = Object.getOwnPropertyNames(this._scopeNgs);
         let allMatchScopes = (scopes.filter(x => x.startsWith(`${scope}.`)) || []).sort((a, b) => a.length - b.length);
         let tempCache = { tags: {}, tab: '' };
         let flag = false;
         let ngs = [];
         for(let key of allMatchScopes){
-            ngs.push(this.scopeNgs[key]);
+            ngs.push(this._scopeNgs[key]);
         }
         ngs.push(currentNg);
         for(let ng of ngs){
@@ -89,22 +89,22 @@ class TemplateEngine {
             }
             let tagKeys = Object.getOwnPropertyNames(cache.tags);
             for(let tagKey of tagKeys){
-                tempCache = setCacheText(tempCache, tagKey, cache.tags[tagKey]);
+                tempCache = NG.SetCacheText(tempCache, tagKey, cache.tags[tagKey]);
                 flag = true;
             }
         }
         if(flag)
-            return getCacheText(tempCache);
+            return NG.GetCacheText(tempCache);
         return null;
     }
 
     initNg(scope = '') {
         if(!scope)
             return this._buildNewNg(scope);
-        if(!this.scopeNgs[scope]) {
-            this.scopeNgs[scope] = this._buildNewNg(scope);
+        if(!this._scopeNgs[scope]) {
+            this._scopeNgs[scope] = this._buildNewNg(scope);
         }
-        return this.scopeNgs[scope]
+        return this._scopeNgs[scope]
     }
 
     generateCode(nodes) {
@@ -133,109 +133,17 @@ class TemplateEngine {
     }
 
     _buildNewNg(scope){
-        let result = new NG(scope);
-        for (let item in this.helper) {
-            if(NG.prototype[item]){
-                continue;
+        let result = new NG(scope, this);
+        if(this.config.helper){
+            for (let item in this.config.helper) {
+                if(NG.prototype[item]){
+                    continue;
+                }
+                NG.prototype[item] = this.config.helper[item];
             }
-            NG.prototype[item] = this.helper[item];
         }
         return result;
     }
 }
 
-const templateEngine = new TemplateEngine();
-
-class NG {
-    constructor(scope) {
-        this._cache = {};
-        this._currentTab = '';
-        this._scope = scope;
-    }
-
-    include(filePath, model) {
-        let func = templateEngine.compileFile(filePath.trim());
-        let res = this.__res;
-        if(func === null) return '';
-        let result = templateEngine.run({compiled: func, model, scope: this._scope, ng: this}) || '';
-        this.__res = res;
-        let tabs = this._getTabFromText(res);
-        let tab = (filePath && filePath[0] === ' ') ? tabs.tabs : tabs.tabsWithChar;
-        return result.replace(/\n/g, '\n' + tab);
-    }
-
-    _getTabFromText(text) {
-        if(!text) return { tabs: '', tabsWithChar: '' };
-        let tabs = '';
-        let tabsWithChar = '';
-        for(let i = text.length - 1; i >= 0; i--){
-            if(text[i] === '\n') break;
-            if(/[^\S]/.test(text[i])) {
-                tabs = text[i] + tabs;
-                tabsWithChar = text[i] + tabsWithChar;
-            } else{
-                tabs = '';
-                tabsWithChar = ' ' + tabsWithChar;
-            }
-        }
-        return {tabs, tabsWithChar};
-    }
-
-    _setCurrentTab(tab) {
-        this._currentTab = tab || '';
-    }
-
-    _setCacheTab(cacheKey) {
-        let cache = cacheKey.trim();
-        let tab = this._getTabFromText(this.__res);
-        if (!this._cache[cache]) {
-            this._cache[cache] = {
-                tags: {},
-                tab: tab
-            };
-        } else {
-            this._cache[cache].tab = tab;
-        }
-    }
-
-    _getCacheTab(cacheKey) {
-        if (!this._cache[cacheKey]) return { tabs: '', tabsWithChar: '' };
-        return this._cache[cacheKey].tab;
-    }
-
-    getCache(cacheKey) {
-        return this._cache[cacheKey];
-    }
-
-    _setCacheText(cacheKey, tag, text) {
-        this._cache[cacheKey] = setCacheText(this._cache[cacheKey], tag, text);
-    }
-}
-
-function setCacheText(cache, tag, text){
-    let tempTag = tag || '';
-    if (!cache) {
-        cache = {
-            tags: { [tempTag]: text || '' },
-            tab: { tabs: '', tabsWithChar: '' }
-        };
-    } else {
-        if (cache.tags[tempTag] && !tempTag){
-            cache.tags[tempTag] += text || '';
-        } else if(!cache.tags[tempTag]) {
-            cache.tags[tempTag] = text || '';
-        }
-    }
-    return cache;
-}
-
-function getCacheText(cache){
-    let tagKeys = Object.getOwnPropertyNames(cache.tags);
-    let text = '';
-    for(let key of tagKeys){
-        text += cache.tags[key] || '';
-    }
-    return text;
-}
-
-module.exports = templateEngine;
+module.exports = TemplateEngine;

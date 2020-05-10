@@ -8,27 +8,35 @@ class File {
     }
 
     getTemplateDir() {
-        return this._getPath(path.join(this.config.templateDir));
+        return this._getPath(this.config.root, path.join(this.config.templateDir));
     }
 
     getOutputDir() {
-        return this._getPath(path.join(this.config.outputDir));
+        return this._getPath(this.config.root, path.join(this.config.outputDir));
+    }
+
+    getModelsDir() {
+        return this._getPath(this.config.root, path.join(this.config.modelsDir));
     }
 
     cleanOutput() {
-        this.removeDir(this.getOutputDir());
+        File.RemoveDir(this.getOutputDir());
     }
 
     getTemplatePath(filePath) {
-        return this._getPath(path.join(this.config.templateDir, filePath));
+        return this._getPath(this.config.root, path.join(this.config.templateDir, filePath));
     }
 
     getOutputPath(filePath) {
-        return this._getPath(path.join(this.config.outputDir, filePath));
+        return this._getPath(this.config.root, path.join(this.config.outputDir, filePath));
+    }
+
+    getModelsPath(filePath) {
+        return this._getPath(this.config.root, path.join(this.config.modelsDir, filePath));
     }
 
     readAllModels() {
-        return this.readAllFiles(this.config.modelsDir);
+        return File.ReadAllFiles(this.getModelsDir());
     }
 
     getModelFile(filePath) {
@@ -36,29 +44,16 @@ class File {
         let fileName = filePath.split('/').slice(-1)[0] || '';
         let fullFileName = fileName;
         fileName = fileName.substring(0, fileName.lastIndexOf('.'));
-        return { path: this._getPath(path.join(this.config.modelsDir, filePath)), dirPaths, fileName, fullFileName };
+        return { path: this.getModelsPath(filePath), dirPaths, fileName, fullFileName };
     }
 
     output({ filePath, data }) {
-        return this.writeFile(filePath, data);
+        return this.writeFileToOutput(filePath, data);
     }
 
-    readFile(filePath) {
+    writeFileToOutput(filePath, text) {
         return new Promise((resolve, reject) => {
-            fs.readFile(this._getPath(filePath), 'utf8', (err, data) => {
-                if (err) {
-                    console.error(`An error happened when reading the file: ${filePath}`, err);
-                    resolve('');
-                    return;
-                }
-                resolve(data);
-            });
-        });
-    }
-
-    writeFile(filePath, text) {
-        return new Promise((resolve, reject) => {
-            this._ensureDir(path.join(this.getOutputDir(), filePath)).then(p => {
+            File._EnsureDir(path.join(this.getOutputDir(), filePath)).then(p => {
                 if (!p) {
                     resolve();
                     return;
@@ -78,7 +73,20 @@ class File {
         });
     }
 
-    removeDir(dirPath) {
+    static ReadFile(filePath) {
+        return new Promise((resolve, reject) => {
+            fs.readFile(filePath, 'utf8', (err, data) => {
+                if (err) {
+                    console.error(`An error happened when reading the file: ${filePath}`, err);
+                    resolve('');
+                    return;
+                }
+                resolve(data);
+            });
+        });
+    }
+
+    static RemoveDir(dirPath) {
         if (!fs.existsSync(dirPath)) return;
 
         const files = fs.readdirSync(dirPath);
@@ -86,7 +94,7 @@ class File {
             files.forEach(filename => {
                 const subPath = path.join(dirPath, filename);
                 if (fs.statSync(subPath).isDirectory()) {
-                    this.removeDir(subPath);
+                    File.RemoveDir(subPath);
                 } else {
                     fs.unlinkSync(subPath);
                 }
@@ -95,25 +103,25 @@ class File {
         fs.rmdirSync(dirPath);
     }
 
-    copy(from, to) {
+    static Copy(from, to) {
         fs.createReadStream(from).pipe(fs.createWriteStream(to));
     }
 
-    async readAllFiles(filePath, dirPaths = []) {
-        let dir = this._getPath(filePath);
+    static async ReadAllFiles(filePath, dirPaths = []) {
+        let dir = filePath;
         if (!dir)
             return [];
-        let files = await this._readdir(dir);
+        let files = await File._ReadDir(dir);
         if (!files)
             return [];
         let result = [];
         for (let file of files) {
             let pathName = path.join(dir, file);
-            let stats = await this._getStat(pathName);
+            let stats = await File._GetStat(pathName);
             if (!stats)
                 continue;
             if (stats.isDirectory()) {
-                let res = await this.readAllFiles(pathName, [...dirPaths, file]);
+                let res = await File.ReadAllFiles(pathName, [...dirPaths, file]);
                 result.push(...res);
                 continue;
             }
@@ -124,7 +132,7 @@ class File {
         return result;
     }
 
-    _getStat(filePath) {
+    static _GetStat(filePath) {
         return new Promise((resolve, reject) => {
             fs.stat(filePath, (err, stats) => {
                 if (err) {
@@ -137,7 +145,7 @@ class File {
         });
     }
 
-    _readdir(dir) {
+    static _ReadDir(dir) {
         return new Promise((resolve, reject) => {
             fs.readdir(dir, (err, files) => {
                 if (err) {
@@ -150,7 +158,7 @@ class File {
         });
     }
 
-    _ensureDir(filePath) {
+    static _EnsureDir(filePath) {
         return new Promise((resolve, reject) => {
             let dir = path.dirname(filePath);
             fs.access(dir, fs.constants.F_OK, (err) => {
@@ -170,9 +178,9 @@ class File {
         });
     }
 
-    _getPath(filePath) {
-        return util.getPath(this.config.root, filePath);
+    _getPath(root, filePath) {
+        return util.getPath(root, filePath);
     }
 }
 
-module.exports = new File();
+module.exports = File;

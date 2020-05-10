@@ -1,10 +1,9 @@
 require('chai').should();
-const templateEngine = require('../src/templateEngine');
-const file = require('../src/utils/file');
+const TemplateEngine = require('../src/templateEngine');
+const File = require('../src/utils/file');
 const path = require('path');
-file.config = { root: 'tests' };
 
-templateEngine.config = {root: path.join(process.cwd(), 'tests')};
+const templateEngine = new TemplateEngine({root: path.join(process.cwd(), 'tests')});
 
 describe("templateEngine", function () {
     describe("preCompile", function () {
@@ -13,7 +12,7 @@ describe("templateEngine", function () {
         });
 
         it('should work weel', async function () {
-            let text = await file.readFile('test1');
+            let text = await File.ReadFile('tests/test1');
             let tokens = templateEngine.preCompile(text);
             tokens.length.should.equal(3);
             tokens[0].text.should.equal('aaa');
