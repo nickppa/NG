@@ -1,7 +1,5 @@
-class Test{
-    name = {
+module.exports = {
+    name: {
         display: 'Name2'
     }
-}
-
-module.exports = Test;
+};

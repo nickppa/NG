@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 
 const regUpper = /[A-Z]/;
-const regEmpty = /[ _\-\.]/;
+const regEmpty = /[ _\-\.\/]/;
 class Util {
     constructor(){
     }
@@ -28,13 +28,9 @@ class Util {
         return result;
     }
 
-    toPascalCase(text, ignoreArrayInside = false){
+    toPascalCase(text, separator = '', ignoreArrayInside = false){
         let texts = this._getTexts(text, ignoreArrayInside);
-        let result = '';
-        for (var t of texts) {
-            result += this._upperFirst(t);
-        }
-        return result;
+        return texts.map(t => this._upperFirst(t)).join(separator);
     }
 
     toSnakeCase(text, separator = '-', ignoreArrayInside = false){
@@ -65,18 +61,22 @@ class Util {
         let result = [];
         if (regEmpty.test(text) || regUpper.test(text)) {
             let temp = '';
+            let lastIsUpper = false;
             for (let char of text) {
                 if (char >= 'A' && char <= 'Z') {
-                    if (temp) {
+                    if (!lastIsUpper && temp) {
                         result.push(temp);
                         temp = '';
                     }
                     temp += char.toLowerCase();
-                } else if (char === ' ' || char === '-' || char === '_' || char === '.') {
+                    lastIsUpper = true;
+                } else if (char === ' ' || char === '-' || char === '_' || char === '.' || char === '/') {
                     result.push(temp);
                     temp = '';
+                    lastIsUpper = false;
                 } else {
                     temp += char;
+                    lastIsUpper = false;
                 }
             }
             if(temp){

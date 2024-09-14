@@ -1,11 +1,10 @@
 @{
-	let name = ng.toCamelCase(model._props.name);
+	let name = ng.toCamelCase(model.name);
 	let moduleName = `${name}Manage`;
     let pName = ng.toPascalCase(name);
     let arr = [];
-    for(var i in model){
-        if(i[0] === '_') continue;
-        arr.push(model[i]);
+    for(var i in model.inputs){
+        arr.push(model.inputs[i]);
     }
 }import React, { Component } from 'react';
 import {
@@ -17,10 +16,10 @@ import { connect } from 'dva';
 @[requests]{
 @:{
 export async function get@(pName)(id) {
-  return request(`/api/@(ng.toSnakeCase([model._props.modelName, ng.toSnakeCase(model._props.name, '-')], '/', true))/${id}`);
+  return request(`/api/@(ng.toSnakeCase([model._modelName, ng.toSnakeCase(model.name, '-')], '/', true))/${id}`);
 }
 export async function save@(pName)(data) {
-  return request('/api/@(ng.toSnakeCase([model._props.modelName, ng.toSnakeCase(model._props.name, '-')], '/', true))/save', {
+  return request('/api/@(ng.toSnakeCase([model._modelName, ng.toSnakeCase(model.name, '-')], '/', true))/save', {
     method: 'POST',
     data
   });
@@ -65,7 +64,7 @@ class Create@(pName) extends Component {
 
         return (
             <Modal
-                title="@(model._props.display)"
+                title="@(model.display)"
                 visible={this.props.isShown}
                 onCancel={this.handleCancel}
                 onOk={this.handleSubmit}

@@ -36,6 +36,9 @@ var TESTS = [
     }
     , 'WHITESPACE', (/^([^\S\n]+)/) // http://stackoverflow.com/a/3469155
     , 'IDENTIFIER', (/^([_$a-zA-Z\xA0-\uFFFF][_$a-zA-Z0-9\xA0-\uFFFF]*)/)
+    
+    , 'DOUBLE_FORWARD_SLASH', (/^(\/\/)/)
+    , 'FORWARD_SLASH', (/^(\/)/)
   
     , 'BACKSLASH', (/^(\\)/)
     , 'DOUBLE_QUOTE', (/^(\")/)

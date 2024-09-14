@@ -11,7 +11,7 @@ describe("templateEngine", function () {
             'aa'.should.equal('aa');
         });
 
-        it('should work weel', async function () {
+        it('should work well', async function () {
             let text = await File.ReadFile('tests/test1');
             let tokens = templateEngine.preCompile(text);
             tokens.length.should.equal(3);
@@ -20,7 +20,7 @@ describe("templateEngine", function () {
             tokens[2].text.should.equal('sss');
         });
 
-        it('should also work weel', function () {
+        it('should also work well', function () {
             let tokens = templateEngine.preCompile('aaa@(model)sss');
             tokens.length.should.equal(3);
             tokens[0].text.should.equal('aaa');
@@ -28,7 +28,87 @@ describe("templateEngine", function () {
             tokens[2].text.should.equal('sss');
         });
 
-        it('should work weel will have () in text and code', function () {
+        it('should also work well with regex', function () {
+            let tokens = templateEngine.preCompile('aaa@(/\'/.test(123))sss');
+            tokens.length.should.equal(3);
+            tokens[0].text.should.equal('aaa');
+            tokens[1].text.should.equal('/\'/.test(123)');
+            tokens[2].text.should.equal('sss');
+        });
+
+        it('should also work well with regex2', function () {
+            let tokens = templateEngine.preCompile('aaa@( /\'/.test(123))sss');
+            tokens.length.should.equal(3);
+            tokens[0].text.should.equal('aaa');
+            tokens[1].text.should.equal(' /\'/.test(123)');
+            tokens[2].text.should.equal('sss');
+        });
+
+        it('should also work well with regex3', function () {
+            let tokens = templateEngine.preCompile('aaa@(/(\({\{\'"`/.test(123))sss');
+            tokens.length.should.equal(3);
+            tokens[0].text.should.equal('aaa');
+            tokens[1].text.should.equal('/(\({\{\'"`/.test(123)');
+            tokens[2].text.should.equal('sss');
+        });
+
+        it('should also work well with regex4', function () {
+            let tokens = templateEngine.preCompile('aaa@(/)\)}\}\'"`/.test(123))sss');
+            tokens.length.should.equal(3);
+            tokens[0].text.should.equal('aaa');
+            tokens[1].text.should.equal('/)\)}\}\'"`/.test(123)');
+            tokens[2].text.should.equal('sss');
+        });
+
+        it('should also work well with 2 regex', function () {
+            let tokens = templateEngine.preCompile('aaa@{/\'/.test(123)}sss');
+            tokens.length.should.equal(3);
+            tokens[0].text.should.equal('aaa');
+            tokens[1].text.should.equal('/\'/.test(123)');
+            tokens[2].text.should.equal('sss');
+        });
+
+        it('should also work well with 2 regex2', function () {
+            let tokens = templateEngine.preCompile('aaa@{ /\'/.test(123)}sss');
+            tokens.length.should.equal(3);
+            tokens[0].text.should.equal('aaa');
+            tokens[1].text.should.equal(' /\'/.test(123)');
+            tokens[2].text.should.equal('sss');
+        });
+
+        it('should also work well with 2 regex3', function () {
+            let tokens = templateEngine.preCompile('aaa@{/(\(/.test(123)}sss');
+            tokens.length.should.equal(3);
+            tokens[0].text.should.equal('aaa');
+            tokens[1].text.should.equal('/(\(/.test(123)');
+            tokens[2].text.should.equal('sss');
+        });
+
+        it('should also work well with 2 regex4', function () {
+            let tokens = templateEngine.preCompile('aaa@{/)\)}\}\'"`/.test(123)}sss');
+            tokens.length.should.equal(3);
+            tokens[0].text.should.equal('aaa');
+            tokens[1].text.should.equal('/)\)}\}\'"`/.test(123)');
+            tokens[2].text.should.equal('sss');
+        });
+
+        it('should also work well with no regex', function () {
+            let tokens = templateEngine.preCompile('aaa@(123/ 222)sss');
+            tokens.length.should.equal(3);
+            tokens[0].text.should.equal('aaa');
+            tokens[1].text.should.equal('123/ 222');
+            tokens[2].text.should.equal('sss');
+        });
+
+        it('should also work well with no regex2', function () {
+            let tokens = templateEngine.preCompile('aaa@(123 / 222)sss');
+            tokens.length.should.equal(3);
+            tokens[0].text.should.equal('aaa');
+            tokens[1].text.should.equal('123 / 222');
+            tokens[2].text.should.equal('sss');
+        });
+
+        it('should work well will have () in text and code', function () {
             let tokens = templateEngine.preCompile('aa()a@(mod()el)ss()s');
             tokens.length.should.equal(3);
             tokens[0].text.should.equal('aa()a');
@@ -36,7 +116,7 @@ describe("templateEngine", function () {
             tokens[2].text.should.equal('ss()s');
         });
 
-        it('should work weel will have white space in text and code', function () {
+        it('should work well will have white space in text and code', function () {
             let tokens = templateEngine.preCompile('aa a@(model)sss');
             tokens.length.should.equal(3);
             tokens[0].text.should.equal('aa a');
@@ -44,7 +124,7 @@ describe("templateEngine", function () {
             tokens[2].text.should.equal('sss');
         });
 
-        it('should work weel will have white space in text and code', function () {
+        it('should work well will have white space in text and code', function () {
             let tokens = templateEngine.preCompile('aa  \t a@(model)sss');
             tokens.length.should.equal(3);
             tokens[0].text.should.equal('aa  \t a');
@@ -52,7 +132,7 @@ describe("templateEngine", function () {
             tokens[2].text.should.equal('sss');
         });
 
-        it('should work weel will have white space in text and code', function () {
+        it('should work well will have white space in text and code', function () {
             let tokens = templateEngine.preCompile('aa \r\n \t a@(model)sss');
             tokens.length.should.equal(6);
             tokens[0].text.should.equal('aa ');
@@ -63,7 +143,7 @@ describe("templateEngine", function () {
             tokens[5].text.should.equal('sss');
         });
 
-        it('should work weel will have () in code', function () {
+        it('should work well will have () in code', function () {
             let tokens = templateEngine.preCompile('aaa@(mod()el)sss');
             tokens.length.should.equal(3);
             tokens[0].text.should.equal('aaa');
@@ -71,7 +151,7 @@ describe("templateEngine", function () {
             tokens[2].text.should.equal('sss');
         });
 
-        it('should work weel will have "" in code', function () {
+        it('should work well will have "" in code', function () {
             let tokens = templateEngine.preCompile('aaa@(mod"("el)sss');
             tokens.length.should.equal(3);
             tokens[0].text.should.equal('aaa');
@@ -79,7 +159,7 @@ describe("templateEngine", function () {
             tokens[2].text.should.equal('sss');
         });
 
-        it('should work weel will have complex "" in code', function () {
+        it('should work well will have complex "" in code', function () {
             let tokens = templateEngine.preCompile('aaa@(mod"(\'"el)sss');
             tokens.length.should.equal(3);
             tokens[0].text.should.equal('aaa');
@@ -87,7 +167,7 @@ describe("templateEngine", function () {
             tokens[2].text.should.equal('sss');
         });
 
-        it('should work weel will have complex "" in code', function () {
+        it('should work well will have complex "" in code', function () {
             let tokens = templateEngine.preCompile('aaa@(mod"(\'`"el)sss');
             tokens.length.should.equal(3);
             tokens[0].text.should.equal('aaa');
@@ -95,7 +175,7 @@ describe("templateEngine", function () {
             tokens[2].text.should.equal('sss');
         });
 
-        it('should work weel will have complex "" in code', function () {
+        it('should work well will have complex "" in code', function () {
             let tokens = templateEngine.preCompile('aaa@(mod"(\'`" + aaa + ""el)sss');
             tokens.length.should.equal(3);
             tokens[0].text.should.equal('aaa');
@@ -103,14 +183,14 @@ describe("templateEngine", function () {
             tokens[2].text.should.equal('sss');
         });
 
-        it('should work weel will have very complex "" in code', function () {
+        it('should work well will have very complex "" in code', function () {
             let tokens = templateEngine.preCompile('aaa@(mod"(\n     \'`" + aaa + ""el)sss');
             tokens[0].text.should.equal('aaa');
             tokens[1].text.should.equal('mod"(\n     \'`" + aaa + ""el');
             tokens[2].text.should.equal('sss');
         });
 
-        it('should work weel will have complex "" in code2', function () {
+        it('should work well will have complex "" in code2', function () {
             let tokens = templateEngine.preCompile('aaa@(mod"(\\""el)sss');
             tokens.length.should.equal(3);
             tokens[0].text.should.equal('aaa');
@@ -118,7 +198,7 @@ describe("templateEngine", function () {
             tokens[2].text.should.equal('sss');
         });
 
-        it('should work weel will have complex "" in code2', function () {
+        it('should work well will have complex "" in code2', function () {
             let tokens = templateEngine.preCompile('aaa@(mod"(\\\\"el)sss');
             tokens.length.should.equal(3);
             tokens[0].text.should.equal('aaa');
@@ -126,7 +206,7 @@ describe("templateEngine", function () {
             tokens[2].text.should.equal('sss');
         });
 
-        it('should work weel will have @@', function () {
+        it('should work well will have @@', function () {
             let tokens = templateEngine.preCompile('a@@aa@(mod@@"(\\\\"el)sss');
             tokens.length.should.equal(3);
             tokens[0].text.should.equal('a@aa');
@@ -134,21 +214,21 @@ describe("templateEngine", function () {
             tokens[2].text.should.equal('sss');
         });
 
-        it('should work weel will have text in code', function () {
+        it('should work well will have text in code', function () {
             let tokens = templateEngine.preCompile('aaa@(mo@:del)sss');
             tokens[0].text.should.equal('aaa');
             tokens[1].text.should.equal('mo@:del');
             tokens[2].text.should.equal('sss');
         });
 
-        it('should work weel will have text in code2', function () {
+        it('should work well will have text in code2', function () {
             let tokens = templateEngine.preCompile('aaa@(mo\r\n@:del\r\n)sss');
             tokens[0].text.should.equal('aaa');
             tokens[1].text.should.equal('mo\n@:del\n');
             tokens[2].text.should.equal('sss');
         });
 
-        it('should work weel will have text in code3', function () {
+        it('should work well will have text in code3', function () {
             let tokens = templateEngine.preCompile('aaa@{mo\r\n@:{del\r\nssasd@:}sss}sss');
             tokens[0].text.should.equal('aaa');
             tokens[1].text.should.equal('mo');
@@ -160,7 +240,7 @@ describe("templateEngine", function () {
             tokens[7].text.should.equal('sss');
         });
 
-        it('should work weel will have text in code4', function () {
+        it('should work well will have text in code4', function () {
             let tokens = templateEngine.preCompile('aaa@{mo\r\n     \t@:{del\r\nssasd\r\n@:}sss}sss');
             tokens[0].text.should.equal('aaa');
             tokens[1].text.should.equal('mo');
@@ -175,7 +255,7 @@ describe("templateEngine", function () {
             tokens[10].text.should.equal('sss');
         });
 
-        it('should work weel will have text in code5', function () {
+        it('should work well will have text in code5', function () {
             let tokens = templateEngine.preCompile('aaa@{mo@:del\r\nssasdsss}sss');
             tokens[0].text.should.equal('aaa');
             tokens[1].text.should.equal('mo');
@@ -185,7 +265,7 @@ describe("templateEngine", function () {
             tokens[5].text.should.equal('sss');
         });
 
-        it('should work weel will have text in code6', function () {
+        it('should work well will have text in code6', function () {
             let tokens = templateEngine.preCompile('aaa@{mo\r\n@:del\r\nssasdsss}sss');
             tokens[0].text.should.equal('aaa');
             tokens[1].text.should.equal('mo');
@@ -196,7 +276,7 @@ describe("templateEngine", function () {
             tokens[6].text.should.equal('sss');
         });
 
-        it('should work weel will have code in text', function () {
+        it('should work well will have code in text', function () {
             let tokens = templateEngine.preCompile('aaa@{mo\r\n@:{del@(sss)@:}eee}sss');
             tokens[0].text.should.equal('aaa');
             tokens[1].text.should.equal('mo');
@@ -208,7 +288,7 @@ describe("templateEngine", function () {
             tokens[7].text.should.equal('sss');
         });
 
-        it('should work weel will have code in text', function () {
+        it('should work well will have code in text', function () {
             let tokens = templateEngine.preCompile('aaa@{mo\r\n@:{del@(sss)123@:}eee}sss');
             tokens[0].text.should.equal('aaa');
             tokens[1].text.should.equal('mo');

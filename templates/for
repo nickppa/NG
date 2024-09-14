@@ -3,6 +3,9 @@
         for(let i in model.arr){
             let item = model.arr[i];
             let split = i == 0 ? '' : (model.split || '');
+            if(model.startIndex) {
+                item.__startIndex = model.startIndex;
+            }
 @(split)@(ng.include(model.template, item))
         }
     }

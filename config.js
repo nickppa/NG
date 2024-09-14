@@ -18,28 +18,28 @@ module.exports = {
         }
     },
     customModelProp: function (model) {
-        model._props = { ...(model._props || {}), modelName: model._dirPaths.slice(-1)[0] || '' };
+        model._modelName = model._dirPaths.slice(-1)[0] || '';
     },
     customFieldProp: function (field) {
     },
     global,
     mapping: async function (model) {
-        if (model._props && model._props.type === 'edit') {
+        if (model.type === 'edit') {
             return [{
-                scope: `root.${model._props.modelName}`,
+                scope: `root.${model._modelName}`,
                 seq: 0,
                 model,
                 template: 'frontend/react-antd/create/index',
-                output: 'frontend/src/pages/' + util.toSnakeCase([...model._dirPaths], '/', true) + "/" + util.toSnakeCase(model._props.name, '-') + '.js'
+                output: 'frontend/src/pages/' + util.toSnakeCase([...model._dirPaths], '/', true) + "/" + util.toSnakeCase(model.name, '-') + '.js'
             }];
         }
-        if (model._props && model._props.type === 'model') {
+        if (model.type === 'model') {
             return [{
-                scope: `root.${model._props.modelName}`,
+                scope: `root.${model._modelName}`,
                 seq: 1,
                 model,
                 template: 'frontend/react-antd/service/index',
-                output: 'frontend/src/service/' + util.toSnakeCase(model._props.modelName, '-') + '.js'
+                output: 'frontend/src/service/' + util.toSnakeCase(model._modelName, '-') + '.js'
             }];
         }
         return [];

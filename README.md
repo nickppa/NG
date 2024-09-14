@@ -173,20 +173,18 @@ Feel free to define the custom js data model, also the rules.
 | _fileName | ```string``` | the name of the file without extension |
 | _fullFileName | ```string``` | the name of the file with extension |
 | _dirPaths | ```string[]``` | the string array of the folder path, relative to the data model's directory |
-| _props.name | ```string``` | the class name |
+| _name | ```string``` | the class name |
 #### The fields of the data model
 for the object type
 _ref: if you defined ```ref: '<filePath>'```(The ```<filePath>``` here is a relative path to the data model's directory), the _ref property will point to the specific data model
 ```
-class OrderDetail{
-    ccc = {
+module.exports = {
+    ccc: {
         display: 'Name1',
         ref: 'order-manage/test.js',
         rules:[{type: 'required', message: 'Must required'},{type: 'email', message: 'Must be email format'}]
     }
-}
-
-module.exports = OrderDetail;
+};
 ```
 
 ## Configuration(including the connector)

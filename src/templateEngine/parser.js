@@ -13,6 +13,7 @@ class Parser {
         this.tokens = [];
         this.tokens.unshift.apply(this.tokens, tokens.reverse());
         this.stack = [];
+        this.previousNonWhitespace = null;
         while(this._read()){}
         return this._clean(this.nodes);
     }
@@ -40,6 +41,17 @@ class Parser {
             this.node = res;
             this.nodes.push(this.node);
         }
+        
+        if(this.node.constructor.name === 'CodesNode') {
+            if (cur.type !== tks.WHITESPACE) {
+                this.previousNonWhitespace = cur;
+            }
+        
+            if (cur.type === tks.NEWLINE) {
+                this.previousNonWhitespace = null;
+            }
+        }
+
         return true;
     }
 
@@ -82,7 +94,7 @@ class Parser {
             tokens.pop();
             return node;
         }
-        if(!cur._considerEscaped && 
+        if(!cur._considerEscaped && !this.node.isInRegex && 
                 (cur.type === tks.DOUBLE_QUOTE 
                 || cur.type === tks.SINGLE_QUOTE
                 || cur.type === tks.ES6_QUOTE)){
@@ -97,13 +109,13 @@ class Parser {
             return;
         }
         if(!this.node.isInString){
-            if(cur.type === this.node.leftBlock){
+            if(!this.node.isInRegex && cur.type === this.node.leftBlock){
                 this.node.leftCount++;
                 this.node.text += cur.val;
                 tokens.pop();
                 return;
             }
-            if(cur.type === this.node.rightBlock){
+            if(!this.node.isInRegex && cur.type === this.node.rightBlock){
                 this.node.rightCount++;
                 if(this.node.leftCount === this.node.rightCount){
                     tokens.pop();
@@ -111,6 +123,23 @@ class Parser {
                     return this._createFromStack();
                 }
                 this.node.text += cur.val;
+                tokens.pop();
+                return;
+            }
+            if(this.node.isInRegex && !cur._considerEscaped && cur.type === tks.FORWARD_SLASH){
+                this.node.text += cur.val;
+                this.node.isInRegex = false;
+                tokens.pop();
+                return;
+            }
+            if(!this.node.isInRegex
+                && cur.type === tks.FORWARD_SLASH
+                && this.previousNonWhitespace
+                && this.previousNonWhitespace.type !== tks.IDENTIFIER
+                && this.previousNonWhitespace.type !== tks.NUMERAL
+                && this.previousNonWhitespace.type !== tks.PAREN_CLOSE){
+                this.node.text += cur.val;
+                this.node.isInRegex = true;
                 tokens.pop();
                 return;
             }

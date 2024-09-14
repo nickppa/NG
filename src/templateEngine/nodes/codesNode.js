@@ -10,6 +10,7 @@ class CodesNode{
         this.rightCount = 0;
 
         this.isInString = false;
+        this.isInRegex = false;
         this.outputText = leftBlock === tks.PAREN_OPEN;
         this.codeBlock = leftBlock !== tks.PAREN_OPEN;
         this.stringChar = '';
