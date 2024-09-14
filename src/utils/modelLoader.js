@@ -19,8 +19,6 @@ class ModelLoader {
         }
         if(model === null) return null;
         this._modelCache[f.path] = model;
-        if(!model._name)
-            model._name = util.toPascalCase(f.fileName);
         model._path = f.path;
         model._fileName = f.fileName;
         model._fullFileName = f.fullFileName;

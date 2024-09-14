@@ -173,7 +173,6 @@ Feel free to define the custom js data model, also the rules.
 | _fileName | ```string``` | the name of the file without extension |
 | _fullFileName | ```string``` | the name of the file with extension |
 | _dirPaths | ```string[]``` | the string array of the folder path, relative to the data model's directory |
-| _name | ```string``` | the class name |
 #### The fields of the data model
 for the object type
 _ref: if you defined ```ref: '<filePath>'```(The ```<filePath>``` here is a relative path to the data model's directory), the _ref property will point to the specific data model
