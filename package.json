@@ -19,8 +19,8 @@
   "author": "nickppa@163.com",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@babel/core": "^7.9.0",
-    "@babel/node": "^7.8.7",
+    "@babel/core": "^8.0.1",
+    "@babel/node": "^8.0.1",
     "chai": "^5.1.1",
     "mocha": "^10.8.2"
   }
