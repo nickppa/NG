@@ -2,10 +2,11 @@
   "name": "ng",
   "version": "1.0.0",
   "description": "A code generator platform to generate code",
-  "main": "src/index.js",
+  "main": "dist/src/index.js",
   "scripts": {
-    "start": "babel-node src/index.js --myconfig=config.js",
-    "test": "mocha ./tests/**/*.js --watch"
+    "build": "tsc -p tsconfig.json",
+    "start": "npm run build && node dist/src/index.js --myconfig=config.js",
+    "test": "npm run build && mocha ./dist/tests/**/*.js"
   },
   "repository": {
     "type": "git",
@@ -18,10 +19,17 @@
   ],
   "author": "nickppa@163.com",
   "license": "Apache-2.0",
+  "dependencies": {
+    "chalk": "^4.1.2"
+  },
   "devDependencies": {
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.0.8",
     "@babel/core": "^7.9.0",
     "@babel/node": "^7.8.7",
     "chai": "^5.1.1",
-    "mocha": "^10.8.2"
+    "mocha": "^10.8.2",
+    "typescript": "^5.8.3"
   }
 }

@@ -1,16 +1,36 @@
 const chalk = require('chalk');
-const util = require('./util');
+
+interface ModelFileInfo {
+    path: string;
+    dirPaths: string[];
+    fileName: string;
+    fullFileName: string;
+}
+
+interface FileLike {
+    getModelFile(filePath: string): ModelFileInfo;
+}
+
+interface LoaderConfig {
+    customModelProp?: (model: Record<string, any>) => void;
+    customFieldProp?: (field: Record<string, any>) => void;
+}
+
 class ModelLoader {
-    constructor(config, file) {
+    _modelCache: Record<string, Record<string, any>>;
+    config: LoaderConfig;
+    file: FileLike;
+
+    constructor(config: LoaderConfig, file: FileLike) {
         this._modelCache = {};
         this.config = config;
         this.file = file;
     }
 
-    getModel(f) {
+    getModel(f: ModelFileInfo): Record<string, any> | null {
         if (this._modelCache[f.path])
             return this._modelCache[f.path];
-        let model = null;
+        let model: Record<string, any> | null = null;
         try{
             model = require(f.path);
         } catch (err) {
@@ -28,7 +48,7 @@ class ModelLoader {
         return model;
     }
 
-    _processObject(obj) {
+    _processObject(obj: any): any {
         if(!obj) return obj;
         if(Array.isArray(obj)) {
             for(let i = 0; i < obj.length; i++) {
@@ -57,4 +77,4 @@ class ModelLoader {
     }
 }
 
-module.exports = ModelLoader;
+export = ModelLoader;

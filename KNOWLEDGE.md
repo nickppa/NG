@@ -7,15 +7,21 @@ This file stores repository-level project knowledge collected during review and 
 It is intended to reduce repeated context switching and keep architecture decisions visible in the codebase.
 
 ## Architecture Summary
-- Entry: `src/index.js` reads `--myconfig=<path>` and calls `NGenerator.generate(config)`.
-- Orchestration: `src/ngenerator.js` loads models, collects mapping records, sorts by `seq` then `scope`, then renders or copies outputs.
+- Entry: `src/index.ts` reads `--myconfig=<path>` and calls `NGenerator.generate(config)`.
+- Orchestration: `src/ngenerator.ts` loads models, collects mapping records, sorts by `seq` then `scope`, then renders or copies outputs.
 - User-controlled inputs:
   - Models: `models/`
   - Templates: `templates/`
   - Connector and runtime options: `config.js`
 - Engine internals:
-  - Model processing: `src/utils/modelLoader.js`
+  - Model processing: `src/utils/modelLoader.ts`
   - Template engine pipeline: `src/templateEngine/` (lexer -> parser -> cleaner -> codeGen -> run)
+
+## TypeScript Migration Status
+- Source and tests are migrated to TypeScript (`src/**/*.ts`, `tests/**/*.ts`).
+- Build emits to `dist/` using `tsconfig.json`.
+- Runtime remains CommonJS-compatible.
+- Current migration mode uses `// @ts-nocheck` in migrated files as a compatibility bridge.
 
 ## Confirmed Conventions
 - Model reference key is `_ref`.
@@ -31,11 +37,12 @@ It is intended to reduce repeated context switching and keep architecture decisi
   - `models/order-manage/order-detail.js`
 
 ## Verification Snapshot
-- Test command: `npx mocha ./tests/**/*.js`
+- Build command: `npm run build`
+- Test command: `npm test`
 - Latest result: `64 passing`
 
 ## Known Follow-up Item
-- `src/templateEngine/nodes/blockDefineNode.js` still uses module-level counter `KKK` to generate temporary variable names.
+- `src/templateEngine/nodes/blockDefineNode.ts` still uses module-level counter `KKK` to generate temporary variable names.
 - This is intentionally unchanged in this iteration.
 
 ## Maintenance Notes

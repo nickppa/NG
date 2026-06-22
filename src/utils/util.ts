@@ -3,11 +3,19 @@ const fs = require('fs');
 
 const regUpper = /[A-Z]/;
 const regEmpty = /[ _\-\.\/]/;
+
+interface ReadFileInfo {
+    path: string;
+    dirPaths: string[];
+    fileName: string;
+    fullFileName: string;
+}
+
 class Util {
     constructor(){
     }
 
-    getPath(root, filePath){
+    getPath(root: string, filePath: string): string {
         if(!filePath)
             return filePath;
         if (path.isAbsolute(filePath))
@@ -15,10 +23,10 @@ class Util {
         return path.join(root, filePath);
     }
 
-    toCamelCase(text, ignoreArrayInside = false) {
+    toCamelCase(text: string | string[], ignoreArrayInside = false): string {
         let texts = this._getTexts(text, ignoreArrayInside);
         let result = '';
-        for (var t of texts) {
+        for (const t of texts) {
             if (result) {
                 result += this._upperFirst(t);
             } else {
@@ -28,21 +36,21 @@ class Util {
         return result;
     }
 
-    toPascalCase(text, separator = '', ignoreArrayInside = false){
+    toPascalCase(text: string | string[], separator = '', ignoreArrayInside = false): string {
         let texts = this._getTexts(text, ignoreArrayInside);
         return texts.map(t => this._upperFirst(t)).join(separator);
     }
 
-    toSnakeCase(text, separator = '-', ignoreArrayInside = false){
+    toSnakeCase(text: string | string[], separator = '-', ignoreArrayInside = false): string {
         let texts = this._getTexts(text, ignoreArrayInside);
         return texts.join(separator);
     }
 
-    _getTexts(text, ignoreArrayInside = false) {
+    _getTexts(text: string | string[], ignoreArrayInside = false): string[] {
         if (Array.isArray(text)) {
             if (ignoreArrayInside)
                 return text.filter(x => !!x).map(x => x.toLowerCase());
-            let result = [];
+            let result: string[] = [];
             text.filter(x => !!x).forEach(x => {
                 result.push(...this._splitText(x));
             });
@@ -51,14 +59,14 @@ class Util {
         return this._splitText(text);
     }
 
-    _upperFirst(text){
+    _upperFirst(text: string): string {
         if (!text) return text;
         return text[0].toUpperCase() + text.substring(1);
     }
 
-    _splitText(text) {
+    _splitText(text: string): string[] {
         if (!text) return [];
-        let result = [];
+        let result: string[] = [];
         if (regEmpty.test(text) || regUpper.test(text)) {
             let temp = '';
             let lastIsUpper = false;
@@ -87,7 +95,13 @@ class Util {
         return [text];
     }
 
-    getMappings({root, baseTemplateDir, templateDir, outputDir, ...props}) {
+    getMappings({root, baseTemplateDir, templateDir, outputDir, ...props}: {
+        root?: string;
+        baseTemplateDir: string;
+        templateDir: string;
+        outputDir: string;
+        [key: string]: any;
+    }): Array<{ template: string; output: string; [key: string]: any }> {
         let myRoot = !root ? process.cwd() : root;
         let files = this.readAllFiles(this.getPath(myRoot, path.join(baseTemplateDir, templateDir)));
         return files.map(f => ({
@@ -97,20 +111,24 @@ class Util {
             }));
     }
 
-    readAllTemplates({root, baseTemplateDir, templateDir}) {
+    readAllTemplates({root, baseTemplateDir, templateDir}: {
+        root?: string;
+        baseTemplateDir: string;
+        templateDir: string;
+    }): ReadFileInfo[] {
         let myRoot = !root ? process.cwd() : root;
         return this.readAllFiles(this.getPath(myRoot, path.join(baseTemplateDir, templateDir)));
     }
     
-    readAllFiles(filePath, dirPaths = []) {
+    readAllFiles(filePath: string, dirPaths: string[] = []): ReadFileInfo[] {
         let dir = filePath;
         if (!dir)
             return [];
         let files = fs.readdirSync(dir);
         if (!files)
             return [];
-        let result = [];
-        for (let file of files) {
+        let result: ReadFileInfo[] = [];
+        for (const file of files) {
             let pathName = path.join(dir, file);
             let stats = fs.statSync(pathName);
             if (!stats)
@@ -128,4 +146,4 @@ class Util {
     }
 }
 
-module.exports = new Util();
+export = new Util();

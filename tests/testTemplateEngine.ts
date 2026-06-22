@@ -3,6 +3,12 @@ const TemplateEngine = require('../src/templateEngine');
 const File = require('../src/utils/file');
 const path = require('path');
 
+declare global {
+    interface Object {
+        should: any;
+    }
+}
+
 const templateEngine = new TemplateEngine({root: path.join(process.cwd(), 'tests')});
 
 describe("templateEngine", function () {
@@ -470,3 +476,5 @@ hello@(ng.include('test1', model))!@[bbb]
         });
     });
 })
+
+export {};

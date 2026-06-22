@@ -1,6 +1,21 @@
-var tks = require('../tokens');
+import type { NodeLike } from '../types';
+const tks = require('../tokens') as Record<string, string>;
 
 class CodesNode{
+    text: string;
+    leftBlock: string;
+    rightBlock: string;
+    leftCount: number;
+    rightCount: number;
+    isInString: boolean;
+    isInRegex: boolean;
+    outputText: boolean;
+    codeBlock: boolean;
+    stringChar: string;
+    isClosed: boolean;
+    isFromContinue: boolean;
+    nodes: NodeLike[];
+
     constructor(text = '', leftBlock = ''){
         this.text = text;
 
@@ -21,11 +36,11 @@ class CodesNode{
         this.nodes = [];
     }
 
-    createContinue(){
+    createContinue(): CodesNode {
         let result = new CodesNode();
-        let names = Object.getOwnPropertyNames(this);
-        for(let name of names){
-            result[name] = this[name];
+        let names = Object.getOwnPropertyNames(this) as Array<keyof this>;
+        for (const name of names) {
+            (result as any)[name] = this[name];
         }
         result.text = '';
         result.nodes = [];
@@ -33,12 +48,12 @@ class CodesNode{
         return result;
     }
 
-    generateCode(){
+    generateCode(): string {
         let result = !this.text ? '' : (this.outputText ? ('ng.__res += (' + (this.text || '') + ') || "";') : (this.text || ''));
         for(let i = 0, length = this.nodes.length; i < length; i++){
             let node = this.nodes[i];
             if(node.constructor.name === 'TextNode' || node.constructor.name === 'CodesNode' || node.constructor.name === 'BlockDefineNode'){
-                result += node.generateCode();
+                result += (node.generateCode && node.generateCode()) || '';
             } else {
                 // if(this.nodes[i-1] && this.nodes[i-1].constructor.name === 'NewLineNode' && node.constructor.name === 'WhiteNode' && this.nodes[i+1] && this.nodes[i+1].constructor.name === 'CodesNode' && this.nodes[i+1].outputText){
                 //     result += `ng._setCurrentTab(${JSON.stringify(node.text)});`;
@@ -50,4 +65,4 @@ class CodesNode{
     }
 }
 
-module.exports = CodesNode;
+export = CodesNode;

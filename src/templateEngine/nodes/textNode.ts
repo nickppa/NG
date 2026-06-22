@@ -1,6 +1,15 @@
-var tks = require('../tokens');
+import type { NodeLike } from '../types';
+const tks = require('../tokens') as Record<string, string>;
 
 class TextNode{
+    text: string;
+    leftBlock: string;
+    rightBlock: string;
+    isBlock: boolean;
+    isClosed: boolean;
+    isFromContinue: boolean;
+    nodes: NodeLike[];
+
     constructor(text = '', leftBlock = '', isBlock = false){
         this.text = text;
 
@@ -15,11 +24,11 @@ class TextNode{
         this.nodes = [];
     }
 
-    createContinue(){
+    createContinue(): TextNode {
         let result = new TextNode();
-        let names = Object.getOwnPropertyNames(this);
-        for(let name of names){
-            result[name] = this[name];
+        let names = Object.getOwnPropertyNames(this) as Array<keyof this>;
+        for (const name of names) {
+            (result as any)[name] = this[name];
         }
         result.text = '';
         result.nodes = [];
@@ -27,12 +36,12 @@ class TextNode{
         return result;
     }
 
-    generateCode() {
+    generateCode(): string {
         let result = !this.text ? '' : `ng.__res += ${JSON.stringify(this.text)};`;
-        let lastNode = null;
-        for (let node of this.nodes) {
+        let lastNode: NodeLike | null = null;
+        for (const node of this.nodes) {
             if (node.constructor.name === 'TextNode' || node.constructor.name === 'CodesNode' || node.constructor.name === 'BlockDefineNode') {
-                result += node.generateCode();
+                result += (node.generateCode && node.generateCode()) || '';
             } else if (lastNode && lastNode.constructor.name === 'NewLineNode' && node.constructor.name === 'WhiteNode') {
                 // result += `ng._setCurrentTab(${JSON.stringify(node.text)});`;
                 if (!!node.text){
@@ -51,4 +60,4 @@ class TextNode{
     }
 }
 
-module.exports = TextNode;
+export = TextNode;

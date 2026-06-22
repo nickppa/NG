@@ -5,15 +5,33 @@ const CodeGen = require('./codeGen');
 const NG = require('./ng');
 const path = require('path');
 const fs = require('fs');
+import type { GeneratedCodeResult, NodeLike, TemplateCompiledFn, Token } from './types';
+
+interface RunArgs {
+    compiled: TemplateCompiledFn;
+    model: any;
+    scope?: string;
+    ng?: any;
+}
+
+interface TemplateConfig {
+    root?: string;
+    global?: Record<string, any>;
+    helper?: Record<string, (...args: any[]) => any>;
+}
 
 class TemplateEngine {
-    constructor(config) {
+    config: TemplateConfig;
+    _cache: Record<string, TemplateCompiledFn | null | undefined>;
+    _scopeNgs: Record<string, any>;
+
+    constructor(config: TemplateConfig) {
         this.config = config;
         this._cache = {};
         this._scopeNgs = {};
     }
 
-    compileFile(filePath) {
+    compileFile(filePath: string): TemplateCompiledFn | null | undefined {
         if (this._cache[filePath])
             return this._cache[filePath];
         let text = fs.readFileSync(this._getPath(filePath), { encoding: 'utf8' });
@@ -21,10 +39,16 @@ class TemplateEngine {
         return this._cache[filePath];
     }
 
-    compile(template, filePath = '') {
+    compile(template: string, filePath = ''): TemplateCompiledFn | null | undefined {
         let result = this.generateCode(this.clean(this.preCompile(template)));
+        if (typeof result === 'string') {
+            const emptyFunc = new Function('ng', 'global', 'model', result) as TemplateCompiledFn;
+            emptyFunc.sourcecode = result;
+            emptyFunc.path = filePath;
+            return emptyFunc;
+        }
         try {
-            let func = new Function("ng", "global", "model", result.code);
+            let func = new Function("ng", "global", "model", result.code) as TemplateCompiledFn;
             func.sourcecode = result.code;
             func.rootNode = result.rootNode;
             func.path = filePath;
@@ -34,7 +58,7 @@ class TemplateEngine {
         }
     }
 
-    run({compiled, model, scope, ng = null}) {
+    run({compiled, model, scope, ng = null}: RunArgs): string {
         let myNg = ng;
         if (!myNg) {
             myNg = this.initNg(scope);
@@ -65,7 +89,7 @@ class TemplateEngine {
         return result;
     }
 
-    _getCacheText(scope, currentNg, cacheKey){
+    _getCacheText(scope: string | undefined, currentNg: any, cacheKey: string): string | null {
         if (!scope) {
             let cache = currentNg.getCache(cacheKey);
             if(cache == null){
@@ -98,7 +122,7 @@ class TemplateEngine {
         return null;
     }
 
-    initNg(scope = '') {
+    initNg(scope = ''): any {
         if(!scope)
             return this._buildNewNg(scope);
         if(!this._scopeNgs[scope]) {
@@ -107,32 +131,32 @@ class TemplateEngine {
         return this._scopeNgs[scope]
     }
 
-    generateCode(nodes) {
+    generateCode(nodes: NodeLike[]): GeneratedCodeResult | string {
         let codeGen = new CodeGen();
         return codeGen.generateCode(nodes);
     }
 
-    preCompile(template) {
+    preCompile(template: string): NodeLike[] {
         let l = new Lexer();
         l.write(template);
-        let tokens = l.read();
+        let tokens = l.read() as Token[];
         let parser = new Parser();
         return parser.convert(tokens);
     }
 
-    clean(nodes) {
+    clean(nodes: NodeLike[]): NodeLike[] {
         let cleaner = new Cleaner();
         return cleaner.clean(nodes);
     }
 
-    _getPath(filePath) {
+    _getPath(filePath: string): string {
         if (this.config.root) {
             return path.join(this.config.root, filePath);
         }
         return filePath;
     }
 
-    _buildNewNg(scope){
+    _buildNewNg(scope: string){
         let result = new NG(scope, this);
         if(this.config.helper){
             for (let item in this.config.helper) {
@@ -146,4 +170,4 @@ class TemplateEngine {
     }
 }
 
-module.exports = TemplateEngine;
+export = TemplateEngine;

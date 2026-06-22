@@ -1,6 +1,12 @@
 require('chai').should();
 const util = require('../src/utils/util');
 
+declare global {
+    interface Object {
+        should: any;
+    }
+}
+
 describe('util test', function(){
     it('should split to right strings 1', function(){
         util._splitText('').should.empty;
@@ -46,3 +52,5 @@ describe('util test', function(){
         util.toSnakeCase('aa--BbCd', '_').should.eq('aa_bb_cd');
     });
 });
+
+export {};

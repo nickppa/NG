@@ -5,9 +5,27 @@ const NewLineNode = require('./nodes/newLineNode');
 const WhiteNode = require('./nodes/whiteNode');
 const BlockNode = require('./nodes/blockNode');
 const BlockDefineNode = require('./nodes/blockDefineNode');
+import type { NodeLike, Token } from './types';
+
+type ParserNode = NodeLike;
+type ParserTransitionResult = ParserNode | null | void;
 
 class Parser {
-    convert(tokens){
+    node: ParserNode;
+    nodes: ParserNode[];
+    tokens: Token[];
+    stack: ParserNode[];
+    previousNonWhitespace: Token | null;
+
+    constructor() {
+        this.node = new TextNode('', '', true);
+        this.nodes = [this.node];
+        this.tokens = [];
+        this.stack = [];
+        this.previousNonWhitespace = null;
+    }
+
+    convert(tokens: Token[]): ParserNode[] {
         this.node = new TextNode('', '', true);
         this.nodes = [this.node];
         this.tokens = [];
@@ -18,16 +36,16 @@ class Parser {
         return this._clean(this.nodes);
     }
 
-    _clean(nodes){
-        let result = [];
-        for(var node of nodes){
+    _clean(nodes: ParserNode[]): ParserNode[] {
+        let result: ParserNode[] = [];
+        for (const node of nodes) {
             if(node.isFromContinue && !node.text && !node.isClosed) continue;
             result.push(node);
         }
         return result;
     }
 
-    _read(){
+    _read(): boolean {
         if(!this.tokens || !this.tokens.length)
             return false;
         
@@ -36,8 +54,9 @@ class Parser {
         if(!cur)
             return false;
 
-        let res = this['_next' + this.node.constructor.name](this.tokens, cur, next);
-        if(res){
+        const handler = (this as any)['_next' + this.node.constructor.name] as ((tokens: Token[], cur: Token, next: Token | null) => ParserTransitionResult);
+        let res = handler.call(this, this.tokens, cur, next);
+        if(res != null){
             this.node = res;
             this.nodes.push(this.node);
         }
@@ -55,7 +74,7 @@ class Parser {
         return true;
     }
 
-    _nextCodesNode(tokens, cur, next){
+    _nextCodesNode(tokens: Token[], cur: Token, next: Token | null): ParserTransitionResult {
         if(cur.type === tks.AT_AT){
             this.node.text += "@";
             tokens.pop();
@@ -145,7 +164,9 @@ class Parser {
             }
         } else {
             if(cur.type === tks.BACKSLASH && !cur._considerEscaped){
-                next._considerEscaped = true;
+                if (next) {
+                    next._considerEscaped = true;
+                }
             }
         }
         this.node.text += cur.val;
@@ -153,7 +174,7 @@ class Parser {
         return;
     }
 
-    _nextTextNode(tokens, cur){
+    _nextTextNode(tokens: Token[], cur: Token): ParserTransitionResult {
         if(cur.type === tks.AT_AT){
             this.node.text += "@";
             tokens.pop();
@@ -215,7 +236,7 @@ class Parser {
         return;
     }
 
-    _nextNewLineNode(tokens, cur){
+    _nextNewLineNode(tokens: Token[], cur: Token): ParserTransitionResult {
         if(cur.type === tks.NEWLINE){
             this.node.text += cur.val;
             tokens.pop();
@@ -235,7 +256,7 @@ class Parser {
         return this._createFromStack();
     }
 
-    _nextWhiteNode(tokens, cur){
+    _nextWhiteNode(tokens: Token[], cur: Token): ParserTransitionResult {
         if(cur.type === tks.WHITESPACE){
             this.node.text += cur.val;
             tokens.pop();
@@ -255,7 +276,7 @@ class Parser {
         return this._createFromStack();
     }
 
-    _nextBlockNode(tokens, cur){
+    _nextBlockNode(tokens: Token[], cur: Token): ParserTransitionResult {
         if(cur.type === tks.NEWLINE){
             let node = new NewLineNode(this.node.isText);
             tokens.pop();
@@ -275,28 +296,32 @@ class Parser {
         return this._createFromStack();
     }
 
-    _createFromStack(){
+    _createFromStack(): ParserNode | null {
         if(!this.stack || !this.stack.length)
             return null;
         let preNode = this.stack.pop();
+        if (!preNode) {
+            return null;
+        }
         if(preNode.createContinue)
             return preNode.createContinue();
         return null;
     }
 
-    _createNewBlockDefineNode(cur) {
+    _createNewBlockDefineNode(cur: Token): ParserNode {
         let codesNode = this._createNewCodeNode({type: tks.AT_EXPRESSION_BLOCK});
         this.nodes.push(new BlockDefineNode(cur.val, codesNode));
         return codesNode;
     }
 
-    _createNewCodeNode(cur) {
+    _createNewCodeNode(cur: { type: string }): ParserNode {
         return new CodesNode('', cur.type === tks.AT_EXPRESSION ? tks.PAREN_OPEN : tks.BRACE_OPEN);
     }
 
-    _createNewTextNode(cur) {
+    _createNewTextNode(cur: Token): ParserNode {
         return new TextNode('', cur.type === tks.AT_TEXT_BLOCK_OPEN ? tks.AT_TEXT_BLOCK_OPEN : '', cur.type === tks.AT_TEXT_BLOCK_OPEN);
     }
 }
 
-module.exports = Parser;
+export = Parser;
+
