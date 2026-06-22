@@ -1,5 +1,8 @@
 # NG
 
+## Project Knowledge
+See `KNOWLEDGE.md` for architecture notes, confirmed conventions, and recent decision records.
+
 ## Ideas
 This code generater system has three parts: data model, template and the connector, the user can define his own data model, rules, and create the custom template by following these rules. I think the best template is the user's own template, because he knows his requirement best.
 At last, the user can use connector to connect the data model and template together to generate the code.
@@ -175,12 +178,12 @@ Feel free to define the custom js data model, also the rules.
 | _dirPaths | ```string[]``` | the string array of the folder path, relative to the data model's directory |
 #### The fields of the data model
 for the object type
-_ref: if you defined ```ref: '<filePath>'```(The ```<filePath>``` here is a relative path to the data model's directory), the _ref property will point to the specific data model
+_ref: if you defined ```_ref: '<filePath>'```(The ```<filePath>``` here is a relative path to the data model's directory), the _ref property will point to the specific data model
 ```
 module.exports = {
     ccc: {
         display: 'Name1',
-        ref: 'order-manage/test.js',
+        _ref: 'order-manage/test.js',
         rules:[{type: 'required', message: 'Must required'},{type: 'email', message: 'Must be email format'}]
     }
 };

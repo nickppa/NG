@@ -1,5 +1,8 @@
 # NG
 
+## 项目知识沉淀
+请查看 `KNOWLEDGE.md`，其中包含架构摘要、约定决策与最近变更记录。
+
 ## 想法
 该代码生成系统分为三部分，模型、模板和连接器，用户可自由定义自己的模型，规则，并按照这个规则，由自己定义代码模板，我认为一个由用户自己定义的代码生成模板才是最好的模板，通过连接器将模型和模板进行连接，并指定生成文件的路径。
 
@@ -173,12 +176,12 @@ import {
 | _dirPaths | 字符串数组 | 文件夹路径数组，相对于模型根目录 |
 #### 模型成员
 对于对象类型的成员
-_ref: 若定义了```ref: '<filePath>'```（这里的```<filePath>```是相对于配置中的模型文件夹的相对路径），_ref则会指向相应的模型
+_ref: 若定义了```_ref: '<filePath>'```（这里的```<filePath>```是相对于配置中的模型文件夹的相对路径），_ref则会指向相应的模型
 ```
 module.exports = {
     ccc: {
         display: 'Name1',
-        ref: 'order-manage/test.js',
+        _ref: 'order-manage/test.js',
         rules:[{type: 'required', message: 'Must required'},{type: 'email', message: 'Must be email format'}]
     }
 };

@@ -7,7 +7,7 @@ module.exports = {
         {
             name: 'ccc',
             display: 'Name1',
-            ref: 'order-manage/test.js',
+            _ref: 'order-manage/test.js',
             rules:[{type: 'required', message: 'Must required'},{type: 'email', message: 'Must be email format'}]
         }
     ]

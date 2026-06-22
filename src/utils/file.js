@@ -136,7 +136,7 @@ class File {
         return new Promise((resolve, reject) => {
             fs.stat(filePath, (err, stats) => {
                 if (err) {
-                    console.error(`An error happened when getting the stat: ${pathName}`, err);
+                    console.error(`An error happened when getting the stat: ${filePath}`, err);
                     resolve();
                     return;
                 }
